@@ -59,7 +59,26 @@ def test_log_hypergeometric_left_tail_inverse_above_is_inverse():
 def test_log_hypergeometric_left_tail_inverse_above_is_same_as_log_below():
     k, m, K, M = 5, 13, 16, 30
     for delta in [0.05, 0.1, 0.25]:
-        assert hypergeometric_left_tail_inverse(k, m, np.log(delta), M, start='above') == hypergeometric_left_tail_inverse(k, m, np.log(delta), M, start='below')
+        assert log_hypergeometric_left_tail_inverse(k, m, np.log(delta), M, start='above') == log_hypergeometric_left_tail_inverse(k, m, np.log(delta), M, start='below')
     k, m, K, M = 7, 50, 40, 200
     for delta in [0.05, 0.1, 0.25]:
-        assert hypergeometric_left_tail_inverse(k, m, np.log(delta), M, start='above') == hypergeometric_left_tail_inverse(k, m, np.log(delta), M, start='below')
+        assert log_hypergeometric_left_tail_inverse(k, m, np.log(delta), M, start='above') == log_hypergeometric_left_tail_inverse(k, m, np.log(delta), M, start='below')
+
+
+def test_naive_hypergeometric_left_tail_inverse_above_is_inverse():
+    k, m, K, M = 5, 13, 16, 30
+    assert naive_hypergeometric_left_tail_inverse(k, m, hypergeometric_left_tail(k,m,K,M), M) == K
+    assert naive_hypergeometric_left_tail_inverse(k, m, hypergeometric_left_tail(k,m,K,M)-0.001, M) == K+1
+    assert naive_hypergeometric_left_tail_inverse(k, m, hypergeometric_left_tail(k,m,K,M)+0.001, M) == K
+
+    for delta in [0.05, 0.1, 0.25]:
+        assert hypergeometric_left_tail(k, m, naive_hypergeometric_left_tail_inverse(k,m,delta,M), M) <= delta
+
+
+def test_naive_hypergeometric_left_tail_inverse_above_is_same_as_naive_below():
+    k, m, K, M = 5, 13, 16, 30
+    for delta in [0.05, 0.1, 0.25]:
+        assert naive_hypergeometric_left_tail_inverse(k, m, delta, M, start='above') == naive_hypergeometric_left_tail_inverse(k, m, delta, M, start='below')
+    k, m, K, M = 7, 50, 40, 200
+    for delta in [0.05, 0.1, 0.25]:
+        assert naive_hypergeometric_left_tail_inverse(k, m, delta, M, start='above') == naive_hypergeometric_left_tail_inverse(k, m, delta, M, start='below')

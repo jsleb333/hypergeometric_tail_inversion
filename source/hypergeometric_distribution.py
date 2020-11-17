@@ -107,7 +107,7 @@ def log_hypergeometric_left_tail_inverse(k, m, log_delta, M, start='above'):
         m (int): Sample size.
         log_delta (negative float): Logarithm of the confidence parameter threshold.
         M (int): Population size.
-        start (string, 'above' or 'below'): Specifies if the algorithm should approach delta from above or from below. Use 'above' if k << M - m and below otherwise.
+        start (string, 'above' or 'below'): Specifies if the algorithm should approach log_delta from above or from below. Use 'above' if k << M - m and below otherwise.
 
     See the doc of the function 'hypergeometric_left_tail_inverse' for more info.
 
@@ -127,5 +127,39 @@ def log_hypergeometric_left_tail_inverse(k, m, log_delta, M, start='above'):
         log_hyp_cdf = binomln(K, k) + binomln(M-K-1, M-K-m+k)
         while log_hyp_cdf <= log_delta and K >= k:
             K -= 1
-            log_hyp_cdf += np.log(1 + np.exp(log_hyp_cdf - binomln(K, k) + binomln(M-K-1, M-K-m+k)))
+            log_hyp_cdf += np.log(1 + np.exp(binomln(K, k) + binomln(M-K-1, M-K-m+k) - log_hyp_cdf))
+        return K + 1
+
+
+def naive_hypergeometric_left_tail_inverse(k, m, delta, M, start='above'):
+    """
+    WARNING: This implementation should only be used to benchmark against other implementations.
+
+    Computes the pseudo-inverse of the hypergeometric distribution left tail:
+        HypInv(k, m, delta, M) = min{ K : Hyp(j, m, K, M) <= delta },
+    where Hyp(k, m, K, M) is the cumulative distribution function (CDF).
+
+    Args:
+        k (int): Number of errors observed.
+        m (int): Sample size.
+        delta (float in (0,1)): Confidence parameter threshold.
+        M (int): Population size.
+        start (string, 'above' or 'below'): Specifies if the algorithm should approach delta from above or from below. Use 'above' if k << M - m and below otherwise. See the doc of the function 'hypergeometric_left_tail_inverse' for more info.
+
+    Implements a naive version of the algorithm not using Berkopec's formula, which implies recomputing the entire CDF at each step, hence slowing down considerably the algorithm.
+
+    Returns K the number of errors in the whole population with probability 1 - delta.
+    """
+    if start == 'above':
+        K = k
+        while hypergeom.cdf(k, M, K, m) > delta and K <= M-m+k:
+            K += 1
+        return K
+
+    elif start == 'below':
+        K = M - m + k
+        hyp_cdf = hypergeom.cdf(k, M, K, m)
+        while (hyp_cdf <= delta or np.isclose(hyp_cdf, delta, atol=10e-16)) and K >= k:
+            K -= 1
+            hyp_cdf = hypergeom.cdf(k, M, K, m)
         return K + 1
