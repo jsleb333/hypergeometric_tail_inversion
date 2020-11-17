@@ -6,11 +6,11 @@ from graal_utils import Timer
 
 d = 10
 k, m, M = 50, 200, 1000
-delta = 5e-30
-# delta = .05/(4*(np.e*M/d)**d)
+# delta = 5e-30
+delta = .05/(4*(np.e*M/d)**d)
 # log_delta = np.log(.05/4) - d*np.log(np.e*M/d)
 
-N = 10
+N = 1
 
 with Timer('berkopec above') as t:
     for _ in range(N):

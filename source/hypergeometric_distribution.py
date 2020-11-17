@@ -130,21 +130,28 @@ def hypergeometric_left_tail_inverse(k, m, delta, M, start='below'):
 
     Returns K the number of errors in the whole population with probability 1 - delta.
     """
-    delta *= comb(M, m, exact=True) # Unnormalizating delta
+    norm_factor = comb(M, m, exact=True)
     if start == 'above':
         K = k
-        hyp_cdf = comb(M, m, exact=True) # Unnormalized CDF, necessary to limit numerical errors
-        while hyp_cdf > delta and not close_to(hyp_cdf, delta, atol=0, rtol=10e-16) and K < M-m+k:
-            hyp_cdf -= berkopec_unnormalized_single_term(k, m, K, M)
+        term = berkopec_unnormalized_single_term(k, m, K, M)
+        hyp_cdf = norm_factor # Unnormalized CDF, necessary to limit numerical errors
+        while hyp_cdf/norm_factor > delta and not close_to(hyp_cdf/norm_factor, delta, atol=0, rtol=10e-16) and K < M-m+k:
+            hyp_cdf -= term
             K += 1
+            term *= K*(M-K+1-m+k)
+            term //= (K-k)*(M-K)
         return K
 
     elif start == 'below':
         K = M - m + k
-        hyp_cdf = berkopec_unnormalized_single_term(k, m, K, M)
-        while close_to_or_less_than(hyp_cdf, delta, atol=0, rtol=10e-16) and K >= k:
+        term = berkopec_unnormalized_single_term(k, m, K, M)
+        hyp_cdf = term
+        while close_to_or_less_than(hyp_cdf/norm_factor, delta, atol=0, rtol=10e-16) and K >= k:
+            term *= (K-k)*(M-K)
+            term //= K*(M-K+1-m+k)
+            # term = berkopec_unnormalized_single_term(k, m, K-1, M)
+            hyp_cdf += term
             K -= 1
-            hyp_cdf += berkopec_unnormalized_single_term(k, m, K, M)
         return K + 1
 
 
