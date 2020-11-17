@@ -25,7 +25,7 @@ def hypergeometric_pmf(k, m, K, M):
         K (int): Number of errors in the whole population.
         M (int): Population size.
     """
-    return hypergeom.pmf(k, M, K, m)
+    return binom(K, k)*binom(M-K, m-k)/binom(M, m)
 
 
 def hypergeometric_left_tail(k, m, K, M):
@@ -42,7 +42,7 @@ def hypergeometric_left_tail(k, m, K, M):
         K (int): Number of errors in the whole population.
         M (int): Population size.
     """
-    return hypergeom.cdf(k, M, K, m)
+    return sum(binom(K, j)*binom(M-K, m-j)/binom(M, m) for j in range(k+1))
 
 
 def berkopec_single_term(k, m, K, M):
@@ -57,7 +57,7 @@ def berkopec_single_term(k, m, K, M):
         K (int): Number of errors in the whole population.
         M (int): Population size.
     """
-    return np.exp(binomln(K, k) + binomln(M-K-1, M-K-m+k) - binomln(M, m))
+    return binom(K, k) * binom(M-K-1, M-K-m+k) / binom(M, m)
 
 
 def hypergeometric_left_tail_inverse(k, m, delta, M, start='above'):
@@ -83,7 +83,7 @@ def hypergeometric_left_tail_inverse(k, m, delta, M, start='above'):
     """
     if start == 'above':
         K = k
-        hyp_cdf = hypergeom.cdf(k, M, K, m)
+        hyp_cdf = hypergeometric_left_tail(k, m, K, M)
         while hyp_cdf > delta and K <= M-m+k:
             hyp_cdf -= berkopec_single_term(k, m, K, M)
             K += 1
@@ -92,11 +92,13 @@ def hypergeometric_left_tail_inverse(k, m, delta, M, start='above'):
     elif start == 'below':
         K = M - m + k
         hyp_cdf = berkopec_single_term(k, m, K, M)
-        while (hyp_cdf <= delta or np.isclose(hyp_cdf, delta, atol=10e-16)) and K >= k:
+        # while (hyp_cdf <= delta or np.isclose(hyp_cdf, delta, atol=10e-16)) and K >= k:
+        while hyp_cdf <= delta and K >= k:
             K -= 1
             hyp_cdf += berkopec_single_term(k, m, K, M)
         return K + 1
-
+import warnings
+warnings.filterwarnings('error')
 
 def log_hypergeometric_left_tail_inverse(k, m, log_delta, M, start='above'):
     """
@@ -116,9 +118,17 @@ def log_hypergeometric_left_tail_inverse(k, m, log_delta, M, start='above'):
     log_delta += binomln(M, m)
     if start == 'above':
         K = k
-        log_hyp_cdf = np.log(hypergeom.cdf(k, M, K, m)) + binomln(M, m)
+        log_hyp_cdf = np.log(hypergeometric_left_tail(k, m, K, M)) + binomln(M, m)
+        print(log_hyp_cdf)
         while log_hyp_cdf > log_delta and K <= M-m+k:
-            log_hyp_cdf += np.log(1 - np.exp(binomln(K, k) + binomln(M-K-1, M-K-m+k) - log_hyp_cdf))
+            try:
+                log_hyp_cdf += np.log(1 - np.exp(binomln(K, k) + binomln(M-K-1, M-K-m+k) - log_hyp_cdf))
+            except:
+                print(K)
+                print(np.exp(binomln(K, k) + binomln(M-K-1, M-K-m+k) - log_hyp_cdf))
+                print(binomln(K, k) + binomln(M-K-1, M-K-m+k))
+                print(log_hyp_cdf)
+                log_hyp_cdf += np.log(1 - np.exp(binomln(K, k) + binomln(M-K-1, M-K-m+k) - log_hyp_cdf))
             K += 1
         return K
 
@@ -152,14 +162,15 @@ def naive_hypergeometric_left_tail_inverse(k, m, delta, M, start='above'):
     """
     if start == 'above':
         K = k
-        while hypergeom.cdf(k, M, K, m) > delta and K <= M-m+k:
+        while hypergeometric_left_tail(k, m, K, M) > delta and K <= M-m+k:
             K += 1
         return K
 
     elif start == 'below':
         K = M - m + k
-        hyp_cdf = hypergeom.cdf(k, M, K, m)
-        while (hyp_cdf <= delta or np.isclose(hyp_cdf, delta, atol=10e-16)) and K >= k:
+        hyp_cdf = hypergeometric_left_tail(k, m, K, M)
+        # while (hyp_cdf <= delta or np.isclose(hyp_cdf, delta, atol=10e-16)) and K >= k:
+        while hyp_cdf <= delta and K >= k:
             K -= 1
-            hyp_cdf = hypergeom.cdf(k, M, K, m)
+            hyp_cdf = hypergeometric_left_tail(k, m, K, M)
         return K + 1
