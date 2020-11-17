@@ -1,7 +1,12 @@
 import numpy as np
 from numpy.core.numeric import isclose
-from scipy.special import binom, gammaln
+from scipy.special import binom, comb, gammaln
 from scipy.stats import hypergeom
+import math
+
+import warnings
+warnings.filterwarnings('error')
+
 
 
 def binomln(m, k):
@@ -25,7 +30,8 @@ def hypergeometric_pmf(k, m, K, M):
         K (int): Number of errors in the whole population.
         M (int): Population size.
     """
-    return binom(K, k)*binom(M-K, m-k)/binom(M, m)
+    # return comb(K, k, exact=True)*comb(M-K, m-k, exact=True)/comb(M, m, exact=True)
+    return hypergeom.pmf(k, M, K, m)
 
 
 def hypergeometric_left_tail(k, m, K, M):
@@ -42,14 +48,17 @@ def hypergeometric_left_tail(k, m, K, M):
         K (int): Number of errors in the whole population.
         M (int): Population size.
     """
-    return sum(binom(K, j)*binom(M-K, m-j)/binom(M, m) for j in range(k+1))
-
+    # return sum(hypergeometric_pmf(j, m, K, M) for j in range(max(0, m-M+K), k+1))
+    return hypergeom.cdf(k, M, K, m)
+    # return sum(hypergeom.pmf(j, M, K, m) for j in range(max(0, m-M+K), k+1))
 
 def berkopec_single_term(k, m, K, M):
     """
     Computes a single term of Berkopec's formula for the hypergeometric cumulative distribution function. Berkopec's formula is:
         Hyp(k, m, K, M) = Σ_{J=K}^{M-m+k} binom(J, k) * binom(M-J-1, M-K-m+k) / binom(M, m),
-    where binom(m, k) is the binomial coefficient.
+    where binom(m, k) is the binomial coefficient, with the convention that binom(-1, 0) = 1.
+
+    NOTE: This function divides two very large numbers, which introduces numerical errors of the order of 10-16. These errors can pile up when summing the terms, which can change significantly the result of the algorithm for computing the hypergeometric tail inverse with Berkopec's forumla when delta is smaller than the numerical error. A work around is to normalize at the end only. See for example 'hypergeometric_left_tail_inverse'.
 
     Args:
         k (int): Number of errors observed.
@@ -57,7 +66,45 @@ def berkopec_single_term(k, m, K, M):
         K (int): Number of errors in the whole population.
         M (int): Population size.
     """
-    return binom(K, k) * binom(M-K-1, M-K-m+k) / binom(M, m)
+    if M == K and m == k: # Case with binom(-n, 0) = 1 (scipy's notation is 0).
+        return 1
+    else:
+        return comb(K, k, exact=True) * comb(M-K-1, M-K-m+k, exact=True) / comb(M, m, exact=True)
+
+
+def berkopec_unnormalized_single_term(k, m, K, M):
+    """
+    Computes a unnormalized single term of Berkopec's formula for the hypergeometric cumulative distribution function. Berkopec's formula is:
+        Hyp(k, m, K, M) = Σ_{J=K}^{M-m+k} binom(J, k) * binom(M-J-1, M-K-m+k) / binom(M, m),
+    where binom(m, k) is the binomial coefficient, with the convention that binom(-1, 0) = 1.
+
+    Args:
+        k (int): Number of errors observed.
+        m (int): Sample size.
+        K (int): Number of errors in the whole population.
+        M (int): Population size.
+    """
+    if M == K and m == k: # Case with binom(-n, 0) = 1 (scipy's notation is 0).
+        return comb(K, k, exact=True)
+    else:
+        return comb(K, k, exact=True) * comb(M-K-1, M-K-m+k, exact=True)
+
+
+def hypergeometric_berkopec_left_tail(k, m, K, M):
+    """
+    Hypergeometric distribution left tail, AKA cumulative distribution function using Berkopec's formula.
+
+        Hyp(k, m, K, M) = Σ_{J=K}^{M-m+k} binom(J, k) * binom(M-J-1, M-J-m+k) / binom(M, m)
+
+    where hyp(j, m, K, M) is the probability mass function.
+
+    Args:
+        k (int): Number of errors observed.
+        m (int): Sample size.
+        K (int): Number of errors in the whole population.
+        M (int): Population size.
+    """
+    return sum(berkopec_unnormalized_single_term(k, m, J, M) for J in range(K, M-m+k+1)) / comb(M, m, exact=True)
 
 
 def hypergeometric_left_tail_inverse(k, m, delta, M, start='above'):
@@ -83,22 +130,20 @@ def hypergeometric_left_tail_inverse(k, m, delta, M, start='above'):
     """
     if start == 'above':
         K = k
-        hyp_cdf = hypergeometric_left_tail(k, m, K, M)
-        while hyp_cdf > delta and K <= M-m+k:
-            hyp_cdf -= berkopec_single_term(k, m, K, M)
+        unnormalized_hyp_cdf = comb(M, m, exact=True)
+        while unnormalized_hyp_cdf > delta*comb(M, m, exact=True) and K <= M-m+k:
+            unnormalized_hyp_cdf -= berkopec_unnormalized_single_term(k, m, K, M)
             K += 1
         return K
 
     elif start == 'below':
         K = M - m + k
         hyp_cdf = berkopec_single_term(k, m, K, M)
-        # while (hyp_cdf <= delta or np.isclose(hyp_cdf, delta, atol=10e-16)) and K >= k:
-        while hyp_cdf <= delta and K >= k:
+        while (hyp_cdf <= delta or np.isclose(hyp_cdf, delta, atol=0, rtol=10e-16)) and K >= k:
             K -= 1
             hyp_cdf += berkopec_single_term(k, m, K, M)
         return K + 1
-import warnings
-warnings.filterwarnings('error')
+
 
 def log_hypergeometric_left_tail_inverse(k, m, log_delta, M, start='above'):
     """
@@ -119,7 +164,6 @@ def log_hypergeometric_left_tail_inverse(k, m, log_delta, M, start='above'):
     if start == 'above':
         K = k
         log_hyp_cdf = np.log(hypergeometric_left_tail(k, m, K, M)) + binomln(M, m)
-        print(log_hyp_cdf)
         while log_hyp_cdf > log_delta and K <= M-m+k:
             try:
                 log_hyp_cdf += np.log(1 - np.exp(binomln(K, k) + binomln(M-K-1, M-K-m+k) - log_hyp_cdf))
