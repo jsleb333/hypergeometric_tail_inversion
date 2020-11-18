@@ -28,7 +28,7 @@ def test_berkopec_formula_equals_left_tail():
     assert berkopec == 1
 
 
-def test_hypergeometric_left_tail_inverse_below_is_inverse():
+def test_hypergeometric_left_tail_inverse_is_inverse():
     k, m, K, M = 5, 13, 16, 30
     assert hypergeometric_left_tail_inverse(k, m, hypergeometric_left_tail(k,m,K,M), M) == K
     assert hypergeometric_left_tail_inverse(k, m, hypergeometric_left_tail(k,m,K,M)-0.001, M) == K+1
@@ -38,41 +38,43 @@ def test_hypergeometric_left_tail_inverse_below_is_inverse():
         assert hypergeometric_left_tail(k, m, hypergeometric_left_tail_inverse(k,m,delta,M), M) <= delta
 
 
-def test_hypergeometric_left_tail_inverse_above_is_inverse():
+def test_berkopec_hypergeometric_left_tail_inverse_below_is_inverse():
     k, m, K, M = 5, 13, 16, 30
-    assert hypergeometric_left_tail_inverse(k, m, hypergeometric_left_tail(k,m,K,M), M, start='above') == K
-    assert hypergeometric_left_tail_inverse(k, m, hypergeometric_left_tail(k,m,K,M)-0.001, M, start='above') == K+1
-    assert hypergeometric_left_tail_inverse(k, m, hypergeometric_left_tail(k,m,K,M)+0.001, M, start='above') == K
-
-    delta = 0.1
-    assert hypergeometric_left_tail(k, m, hypergeometric_left_tail_inverse(k,m,delta,M, start='above'), M) <= delta
-    delta = 0.05
-    assert hypergeometric_left_tail(k, m, hypergeometric_left_tail_inverse(k,m,delta,M, start='above'), M) <= delta
-
-
-def test_hypergeometric_left_tail_inverse_below_is_same_as_above():
-    k, m, K, M = 5, 13, 16, 30
-    for delta in [0.05, 0.1, 0.25]:
-        assert hypergeometric_left_tail_inverse(k, m, delta, M, start='below') == hypergeometric_left_tail_inverse(k, m, delta, M, start='above')
-
-
-def test_log_hypergeometric_left_tail_inverse_below_is_inverse():
-    k, m, K, M = 5, 13, 16, 30
-    assert log_hypergeometric_left_tail_inverse(k, m, np.log(hypergeometric_left_tail(k,m,K,M)), M) == K
-    assert log_hypergeometric_left_tail_inverse(k, m, np.log(hypergeometric_left_tail(k,m,K,M)-0.001), M) == K+1
-    assert log_hypergeometric_left_tail_inverse(k, m, np.log(hypergeometric_left_tail(k,m,K,M)+0.001), M) == K
+    assert berkopec_hypergeometric_left_tail_inverse(k, m, hypergeometric_left_tail(k,m,K,M), M) == K
+    assert berkopec_hypergeometric_left_tail_inverse(k, m, hypergeometric_left_tail(k,m,K,M)-0.001, M) == K+1
+    assert berkopec_hypergeometric_left_tail_inverse(k, m, hypergeometric_left_tail(k,m,K,M)+0.001, M) == K
 
     for delta in [0.05, 0.1, 0.25]:
-        assert np.log(hypergeometric_left_tail(k, m, log_hypergeometric_left_tail_inverse(k,m,np.log(delta),M), M)) <= np.log(delta)
+        assert hypergeometric_left_tail(k, m, berkopec_hypergeometric_left_tail_inverse(k,m,delta,M), M) <= delta
 
 
-def test_log_hypergeometric_left_tail_inverse_below_is_same_as_log_above():
+def test_berkopec_hypergeometric_left_tail_inverse_above_is_inverse():
+    k, m, K, M = 5, 13, 16, 30
+    assert berkopec_hypergeometric_left_tail_inverse(k, m, hypergeometric_left_tail(k,m,K,M), M, start='above') == K
+    assert berkopec_hypergeometric_left_tail_inverse(k, m, hypergeometric_left_tail(k,m,K,M)-0.001, M, start='above') == K+1
+    assert berkopec_hypergeometric_left_tail_inverse(k, m, hypergeometric_left_tail(k,m,K,M)+0.001, M, start='above') == K
+
+    for delta in [0.05, 0.1, 0.25]:
+        assert hypergeometric_left_tail(k, m, berkopec_hypergeometric_left_tail_inverse(k,m,delta,M, start='above'), M) <= delta
+
+
+def test_logberkopec_hypergeometric_left_tail_inverse_below_is_inverse():
+    k, m, K, M = 5, 13, 16, 30
+    assert logberkopec_hypergeometric_left_tail_inverse(k, m, np.log(hypergeometric_left_tail(k,m,K,M)), M) == K
+    assert logberkopec_hypergeometric_left_tail_inverse(k, m, np.log(hypergeometric_left_tail(k,m,K,M)-0.001), M) == K+1
+    assert logberkopec_hypergeometric_left_tail_inverse(k, m, np.log(hypergeometric_left_tail(k,m,K,M)+0.001), M) == K
+
+    for delta in [0.05, 0.1, 0.25]:
+        assert np.log(hypergeometric_left_tail(k, m, logberkopec_hypergeometric_left_tail_inverse(k,m,np.log(delta),M), M)) <= np.log(delta)
+
+
+def test_logberkopec_hypergeometric_left_tail_inverse_below_is_same_as_log_above():
     k, m, K, M = 5, 13, 16, 30
     for delta in [0.05, 0.1, 0.25]:
-        assert log_hypergeometric_left_tail_inverse(k, m, np.log(delta), M, start='below') == log_hypergeometric_left_tail_inverse(k, m, np.log(delta), M, start='above')
+        assert logberkopec_hypergeometric_left_tail_inverse(k, m, np.log(delta), M, start='below') == logberkopec_hypergeometric_left_tail_inverse(k, m, np.log(delta), M, start='above')
     k, m, K, M = 7, 50, 40, 200
     for delta in [0.05, 0.1, 0.25]:
-        assert log_hypergeometric_left_tail_inverse(k, m, np.log(delta), M, start='below') == log_hypergeometric_left_tail_inverse(k, m, np.log(delta), M, start='above')
+        assert logberkopec_hypergeometric_left_tail_inverse(k, m, np.log(delta), M, start='below') == logberkopec_hypergeometric_left_tail_inverse(k, m, np.log(delta), M, start='above')
 
 
 def test_naive_hypergeometric_left_tail_inverse_below_is_inverse():

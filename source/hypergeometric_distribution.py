@@ -109,7 +109,39 @@ def hypergeometric_berkopec_left_tail(k, m, K, M):
     return sum(berkopec_unnormalized_single_term(k, m, J, M) for J in range(K, M-m+k+1)) / comb(M, m, exact=True)
 
 
-def hypergeometric_left_tail_inverse(k, m, delta, M, start='below'):
+def hypergeometric_left_tail_inverse(k, m, delta, M):
+    """
+    Computes the pseudo-inverse of the hypergeometric distribution left tail:
+        HypInv(k, m, delta, M) = min{ K : Hyp(j, m, K, M) <= delta },
+    where Hyp(k, m, K, M) is the cumulative distribution function (CDF).
+
+    Args:
+        k (int): Number of errors observed.
+        m (int): Sample size.
+        delta (float in (0,1)): Confidence parameter threshold.
+        M (int): Population size.
+        start (string, 'above' or 'below'): Specifies if the algorithm should approach delta from above or from below. Use 'above' if k << M - m and below otherwise. See the doc of the function 'hypergeometric_left_tail_inverse' for more info.
+
+    Implements a bisection algorithm to find the inverse in O(k log(M-m)), as opposed to the other algorithms which are in Θ(M-m).
+
+    Returns K the number of errors in the whole population with probability 1 - delta.
+    """
+    K_min = k
+    K_max = M - m + k
+    K_mid = (K_max + K_min)//2
+    hyp_cdf = hypergeometric_left_tail(k, m, K_mid, M)
+    while K_max - K_min > 1:
+        if hyp_cdf > delta and not close_to(hyp_cdf, delta, atol=0, rtol=10e-16):
+            K_min = K_mid
+        else:
+            K_max = K_mid
+        K_mid = (K_max + K_min)//2
+        hyp_cdf = hypergeometric_left_tail(k, m, K_mid, M)
+
+    return K_max
+
+
+def berkopec_hypergeometric_left_tail_inverse(k, m, delta, M, start='below'):
     """
     Computes the pseudo-inverse of the hypergeometric distribution left tail:
         HypInv(k, m, delta, M) = min{ K : Hyp(j, m, K, M) <= delta },
@@ -127,6 +159,8 @@ def hypergeometric_left_tail_inverse(k, m, delta, M, start='below'):
     The 'above' algorithm is optimized for the regime where k << M - m and delta near 1, because we compute the CDF using the sum over 'k' but we substract terms using Berkopec's sum over 'K'.
 
     The 'below' algorithm is optimized for the regime where m - k << M and delta near 0, because it ensures that the number of terms to be summed in Berkopec's formula is small and we expect K to be large so that the minimum will be found quickly.
+
+    Both algorithms are in worst case O(M-m) and in Ω(1) in best case. If k is small, the bisection algorithm of 'hypergeometric_left_tail_inverse' is probably faster.
 
     Returns K the number of errors in the whole population with probability 1 - delta.
     """
@@ -155,7 +189,7 @@ def hypergeometric_left_tail_inverse(k, m, delta, M, start='below'):
         return K + 1
 
 
-def log_hypergeometric_left_tail_inverse(k, m, log_delta, M, start='below'):
+def logberkopec_hypergeometric_left_tail_inverse(k, m, log_delta, M, start='below'):
     """
     Computes the pseudo-inverse of the hypergeometric distribution left tail for a logarithmic delta term and with a logarithmic algorithm to avoid under- and overflows and less memory usage.
 
