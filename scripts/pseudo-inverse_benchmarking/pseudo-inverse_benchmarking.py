@@ -1,5 +1,4 @@
 import numpy as np
-from time import sleep
 
 from source import *
 from graal_utils import Timer
@@ -26,11 +25,11 @@ with Timer('berkopec below') as t:
         K = berkopec_hypergeometric_left_tail_inverse(k, m, delta, M, 'below')
     print(K)
 
-with Timer('log above') as t:
+with Timer('log berkopec above') as t:
     for _ in range(N):
         K = logberkopec_hypergeometric_left_tail_inverse(k, m, np.log(delta), M, 'above')
     print(K)
-with Timer('log below') as t:
+with Timer('log berkopec below') as t:
     for _ in range(N):
         K = logberkopec_hypergeometric_left_tail_inverse(k, m, np.log(delta), M, 'below')
     print(K)
