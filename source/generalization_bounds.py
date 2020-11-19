@@ -25,7 +25,7 @@ def hypinv_upperbound(k, m, growth_function, delta=0.05, mprime=None, max_mprime
             max_mprime = 15*m
         mprime = _optimize_mprime(k, m, growth_function, delta, max_mprime)
 
-    return 1/mprime * max(1, hypergeometric_left_tail_inverse(k, m, delta/growth_function(m+mprime), m+mprime) - 1 - k)
+    return max(1, hypergeometric_left_tail_inverse(k, m, delta/4/growth_function(m+mprime), m+mprime) - 1 - k)/mprime
 
 
 def _optimize_mprime(k, m, growth_function, delta, max_mprime):

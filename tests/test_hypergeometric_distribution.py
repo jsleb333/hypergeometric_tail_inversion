@@ -30,11 +30,12 @@ def test_berkopec_formula_equals_left_tail():
 
 def test_hypergeometric_left_tail_inverse_is_inverse():
     k, m, K, M = 5, 13, 16, 30
+    k, m, K, M = 20, 200, 42, 222
     assert hypergeometric_left_tail_inverse(k, m, hypergeometric_left_tail(k,m,K,M), M) == K
-    assert hypergeometric_left_tail_inverse(k, m, hypergeometric_left_tail(k,m,K,M)-0.001, M) == K+1
+    assert hypergeometric_left_tail_inverse(k, m, hypergeometric_left_tail(k,m,K,M)-10e-22, M) == K+1
     assert hypergeometric_left_tail_inverse(k, m, hypergeometric_left_tail(k,m,K,M)+0.001, M) == K
 
-    for delta in [0.05, 0.1, 0.25]:
+    for delta in [0.05, 0.1, 0.25, 10e-20]:
         assert hypergeometric_left_tail(k, m, hypergeometric_left_tail_inverse(k,m,delta,M), M) <= delta
 
 
@@ -44,7 +45,7 @@ def test_berkopec_hypergeometric_left_tail_inverse_below_is_inverse():
     assert berkopec_hypergeometric_left_tail_inverse(k, m, hypergeometric_left_tail(k,m,K,M)-0.001, M) == K+1
     assert berkopec_hypergeometric_left_tail_inverse(k, m, hypergeometric_left_tail(k,m,K,M)+0.001, M) == K
 
-    for delta in [0.05, 0.1, 0.25]:
+    for delta in [0.05, 0.1, 0.25, 10e-20]:
         assert hypergeometric_left_tail(k, m, berkopec_hypergeometric_left_tail_inverse(k,m,delta,M), M) <= delta
 
 
@@ -54,7 +55,7 @@ def test_berkopec_hypergeometric_left_tail_inverse_above_is_inverse():
     assert berkopec_hypergeometric_left_tail_inverse(k, m, hypergeometric_left_tail(k,m,K,M)-0.001, M, start='above') == K+1
     assert berkopec_hypergeometric_left_tail_inverse(k, m, hypergeometric_left_tail(k,m,K,M)+0.001, M, start='above') == K
 
-    for delta in [0.05, 0.1, 0.25]:
+    for delta in [0.05, 0.1, 0.25, 10e-20]:
         assert hypergeometric_left_tail(k, m, berkopec_hypergeometric_left_tail_inverse(k,m,delta,M, start='above'), M) <= delta
 
 

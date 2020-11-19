@@ -127,15 +127,15 @@ def hypergeometric_left_tail_inverse(k, m, delta, M):
     Returns K the number of errors in the whole population with probability 1 - delta.
     """
     K_min = k
-    K_max = M - m + k
-    K_mid = (K_max + K_min)//2
+    K_max = M - m + k + 1
+    K_mid = (K_max + K_min + 1)//2
     hyp_cdf = hypergeometric_left_tail(k, m, K_mid, M)
     while K_max - K_min > 1:
         if hyp_cdf > delta and not close_to(hyp_cdf, delta, atol=0, rtol=10e-16):
             K_min = K_mid
         else:
             K_max = K_mid
-        K_mid = (K_max + K_min)//2
+        K_mid = (K_max + K_min + 1)//2
         hyp_cdf = hypergeometric_left_tail(k, m, K_mid, M)
 
     return K_max
@@ -169,7 +169,7 @@ def berkopec_hypergeometric_left_tail_inverse(k, m, delta, M, start='below'):
         K = k
         term = berkopec_unnormalized_single_term(k, m, K, M)
         hyp_cdf = norm_factor # Unnormalized CDF, necessary to limit numerical errors
-        while hyp_cdf/norm_factor > delta and not close_to(hyp_cdf/norm_factor, delta, atol=0, rtol=10e-16) and K < M-m+k:
+        while hyp_cdf/norm_factor > delta and not close_to(hyp_cdf/norm_factor, delta, atol=0, rtol=10e-16) and K <= M-m+k:
             hyp_cdf -= term
             K += 1
             term *= K*(M-K+1-m+k)
@@ -214,7 +214,7 @@ def logberkopec_hypergeometric_left_tail_inverse(k, m, log_delta, M, start='belo
     if start == 'above':
         K = k
         log_hyp_cdf = math.log(comb(M, m, exact=True))
-        while log_hyp_cdf > log_delta and not close_to(log_hyp_cdf, log_delta, atol=0, rtol=10e-16) and K < M-m+k:
+        while log_hyp_cdf > log_delta and not close_to(log_hyp_cdf, log_delta, atol=0, rtol=10e-16) and K <= M-m+k:
             log_hyp_cdf += np.log1p(-np.exp(binomln(K, k) + binomln(M-K-1, M-K-m+k) - log_hyp_cdf))
             K += 1
         return K
@@ -250,7 +250,7 @@ def naive_hypergeometric_left_tail_inverse(k, m, delta, M, start='below'):
     if start == 'above':
         K = k
         hyp_cdf = hypergeometric_left_tail(k, m, K, M)
-        while hyp_cdf > delta and not close_to(hyp_cdf, delta, atol=0, rtol=10e-16) and K < M-m+k:
+        while hyp_cdf > delta and not close_to(hyp_cdf, delta, atol=0, rtol=10e-16) and K <= M-m+k:
             K += 1
             hyp_cdf = hypergeometric_left_tail(k, m, K, M)
         return K
