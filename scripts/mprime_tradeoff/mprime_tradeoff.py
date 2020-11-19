@@ -1,11 +1,12 @@
 import numpy as np
 import csv
 from graal_utils import Timer
+import os
 
 from source import hypinv_upperbound, hypergeometric_left_tail_inverse, berkopec_hypergeometric_left_tail_inverse
 
 
-def compute_bound_data(k, m, delta=0.05, d=10, max_mprime=10_000):
+def compute_bound_data(k, m, delta=0.05, d=10, max_mprime=3_00):
     growth_function = lambda M: (np.e*M/d)**d
 
     bounds = np.ones(max_mprime)
@@ -28,19 +29,23 @@ if __name__ == "__main__":
 
     import matplotlib.pyplot as plt
 
-    risks = [0]
-    # risks = np.linspace(0, .1, 2)
-    ms = [200]
+    max_mprime = 10_000
+    risks = np.linspace(0, .5, 11)
+    ms = [100, 200, 300, 500, 1000]
+    ds = [10]
 
     for m in ms:
-        for risk in risks:
-            k = int(m*risk)
-            with Timer(f'm={m}, k={k}'):
-                bounds, mprimes = compute_bound_data(k, m)
-                print(m, k, mprimes, bounds[mprimes[0]-1])
-                plt.plot(bounds)
-                plt.scatter(mprimes, [bounds[mprimes[0]-1]])
-    plt.ylim((0,1))
-    plt.xscale('log')
-    plt.grid()
-    plt.show()
+        for d in ds:
+            for risk in risks:
+                k = int(m*risk)
+                path = './scripts/mprime_tradeoff/data/'
+                os.makedirs(path, exist_ok=True)
+                filename = f'mprime_tradeoff-m={m}_k={k}_d={d}'
+                with open(path + filename + '.csv', 'w', newline='') as file:
+                    writer = csv.writer(file)
+                    writer.writerow(['mprime', 'bound'])
+                    with Timer(f'm={m}, k={k}, d={d}'):
+                        bounds, mprimes = compute_bound_data(k, m, d=d, max_mprime=max_mprime)
+                        for mp, bound in enumerate(bounds, start=1):
+                            writer.writerow([mp, bound])
+                        print(m, k, mprimes, bounds[mprimes[0]-1])
