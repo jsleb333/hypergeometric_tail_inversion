@@ -3,7 +3,7 @@ from python2latex import Document, Plot, holi
 import os, sys
 sys.path.append(os.getcwd())
 
-from source import hypergeometric_left_tail
+from source import hypergeometric_tail
 
 
 def plot_hyp_tail_k(ms, Ks, Ms):
@@ -18,13 +18,13 @@ def plot_hyp_tail_k(ms, Ks, Ms):
         for K in Ks:
             M = 3*m
             color = next(palette)
-            plot.add_plot(ks, [hypergeometric_left_tail(k,m,K,M) for k in ks], color=color, label=f'{m=} {K=} {M=}')
+            plot.add_plot(ks, [hypergeometric_tail(k,m,K,M) for k in ks], color=color, label=f'{m=} {K=} {M=}')
             k0 = max(K+m-M,0)
-            plot.add_plot([k0], [hypergeometric_left_tail(k0,m,K,M)], 'only marks', 'mark size=2pt', color=color)
+            plot.add_plot([k0], [hypergeometric_tail(k0,m,K,M)], 'only marks', 'mark size=2pt', color=color)
             km = min(K,m)
-            plot.add_plot([km], [hypergeometric_left_tail(km,m,K,M)], 'only marks', 'mark size=2pt', color=color)
+            plot.add_plot([km], [hypergeometric_tail(km,m,K,M)], 'only marks', 'mark size=2pt', color=color)
             for i in range(3):
-                print(hypergeometric_left_tail(k0+i-1,m,K,M))
+                print(hypergeometric_tail(k0+i-1,m,K,M))
 
     return plot
 
@@ -40,13 +40,13 @@ def plot_hyp_tail_K(ms, ks, Ms):
         for k in ks:
             Ks = np.arange(k, M+3) - 1
             color = next(palette)
-            plot.add_plot(Ks, [hypergeometric_left_tail(k,m,K,M) for K in Ks], color=color, label=f'{m=} {k=} {M=}')
+            plot.add_plot(Ks, [hypergeometric_tail(k,m,K,M) for K in Ks], color=color, label=f'{m=} {k=} {M=}')
             # k0 = max(K+m-M,0)
-            # plot.add_plot([k0], [hypergeometric_left_tail(k0,m,K,M)], 'only marks', 'mark size=2pt', color=color)
+            # plot.add_plot([k0], [hypergeometric_tail(k0,m,K,M)], 'only marks', 'mark size=2pt', color=color)
             # km = min(K,m)
-            # plot.add_plot([km], [hypergeometric_left_tail(km,m,K,M)], 'only marks', 'mark size=2pt', color=color)
+            # plot.add_plot([km], [hypergeometric_tail(km,m,K,M)], 'only marks', 'mark size=2pt', color=color)
             # for i in range(3):
-            #     print(hypergeometric_left_tail(k0+i-1,m,K,M))
+            #     print(hypergeometric_tail(k0+i-1,m,K,M))
 
     return plot
 
@@ -60,7 +60,7 @@ def plot_hyp_tail_M(ks, ms, Ks, max_M=300):
         for m in ms:
             for K in Ks:
                 Ms = np.arange(m, max_M)
-                plot.add_plot(Ms, [hypergeometric_left_tail(k, m, K, M) for M in Ms],
+                plot.add_plot(Ms, [hypergeometric_tail(k, m, K, M) for M in Ms],
                               label=f'{k=} {m=} {K=}')
 
     return plot
@@ -75,7 +75,7 @@ def plot_hyp_tail_delta(ks, ms, Ms):
         for m in ms:
             for M in Ms:
                 deltas = np.linspace(10e-16, .5, 100)
-                plot.add_plot(deltas, [hypergeometric_left_tail(k, m, delta, M) for delta in deltas],
+                plot.add_plot(deltas, [hypergeometric_tail(k, m, delta, M) for delta in deltas],
                               label=f'{k=} {m=} {M=}')
 
     return plot

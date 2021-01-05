@@ -1,6 +1,7 @@
 import numpy as np
+from scipy.special import binom, betaincinv
 
-from source.hypergeometric_distribution import hypergeometric_left_tail_inverse
+from source.hypergeometric_distribution import hypergeometric_tail_inverse
 
 
 def hypinv_upperbound(k, m, growth_function, delta=0.05, mprime=None, max_mprime=None):
@@ -25,7 +26,7 @@ def hypinv_upperbound(k, m, growth_function, delta=0.05, mprime=None, max_mprime
             max_mprime = 15*m
         mprime = optimize_mprime(k, m, growth_function, delta, max_mprime)
 
-    return max(1, hypergeometric_left_tail_inverse(k, m, delta/4/growth_function(m+mprime), m+mprime) - 1 - k)/mprime
+    return max(1, hypergeometric_tail_inverse(k, m, delta/4/growth_function(m+mprime), m+mprime) - 1 - k)/mprime
 
 
 def hypinv_reldev_upperbound(k, m, growth_function, delta=0.05, mprime=None, max_mprime=None):
@@ -55,7 +56,7 @@ def hypinv_reldev_upperbound(k, m, growth_function, delta=0.05, mprime=None, max
     tau = growth_function(M)
     eta = 0
     if k != m:
-        u = hypergeometric_left_tail_inverse(k, m, delta/(4*tau), M) - 1
+        u = hypergeometric_tail_inverse(k, m, delta/(4*tau), M) - 1
         eta = max(1/np.sqrt(mprime), (M)/mprime*np.sqrt(u/M - 2*k/m + k**2/m**2/u*M))
     return k/m + eta**2/2 + eta/2 * np.sqrt(eta**2 + 4*k/m)
 
@@ -82,3 +83,20 @@ def optimize_mprime(k,
 
     return best_mprimes[len(best_mprimes)//2] # Median of the best mprimes
 
+
+def vapnik_pessismistic_bound(k, m, growth_function, delta):
+    e = (np.log(4) + np.log(growth_function(2*m)) - np.log(delta))/m
+    return (k+1)/m + np.sqrt(e)
+
+
+def vapnik_relative_deviation_bound(k, m, growth_function, delta):
+    e = (np.log(4) + np.log(growth_function(2*m)) - np.log(delta))/m
+    r = k/m
+    return r + 2*e*(1 + np.sqrt(1 + r/e))
+
+
+def bininv(k, m, delta):
+    return 1-betaincinv(m-k, k+1, delta)
+
+def sample_compression_bound(k, m, d, delta):
+    return bininv(k, m-d, delta/(m*binom(m, d)))

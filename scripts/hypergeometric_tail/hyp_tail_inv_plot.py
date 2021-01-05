@@ -3,7 +3,7 @@ from python2latex import Document, Plot
 import os, sys
 sys.path.append(os.getcwd())
 
-from source import hypergeometric_left_tail_inverse
+from source import hypergeometric_tail_inverse
 
 
 def plot_hyp_tail_inv_M(ks, ms, deltas, max_M=300):
@@ -17,7 +17,7 @@ def plot_hyp_tail_inv_M(ks, ms, deltas, max_M=300):
             Ms = np.arange(m+1, max_M+1)
             for delta in deltas:
                 tau = lambda M: (np.e*M/25)**25
-                plot.add_plot(Ms, [hypergeometric_left_tail_inverse(k, m, delta/4/tau(M), M)-k for M in Ms],
+                plot.add_plot(Ms, [hypergeometric_tail_inverse(k, m, delta/4/tau(M), M)-k for M in Ms],
                               label=f'{k=} {m=} {delta=}')
 
             plot.add_plot([Ms[0], Ms[-1]], [Ms[0]-m, Ms[-1]-m])
@@ -34,7 +34,7 @@ def plot_hyp_tail_inv_delta(ks, ms, Ms):
         for m in ms:
             for M in Ms:
                 deltas = np.linspace(10e-16, .5, 100)
-                plot.add_plot(deltas, [hypergeometric_left_tail_inverse(k, m, delta, M) for delta in deltas],
+                plot.add_plot(deltas, [hypergeometric_tail_inverse(k, m, delta, M) for delta in deltas],
                               label=f'{k=} {m=} {M=}')
 
     return plot
