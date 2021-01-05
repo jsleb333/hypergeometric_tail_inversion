@@ -1,5 +1,4 @@
 import numpy as np
-from numpy.core.numeric import isclose
 from scipy.special import binom, comb, gammaln
 from scipy.stats import hypergeom
 import math

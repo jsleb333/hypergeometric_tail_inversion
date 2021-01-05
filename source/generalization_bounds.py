@@ -30,7 +30,7 @@ def hypinv_upperbound(k, m, growth_function, delta=0.05, mprime=None, max_mprime
 
 def hypinv_reldev_upperbound(k, m, growth_function, delta=0.05, mprime=None, max_mprime=None):
     """
-    Implements the bound of Theorem TODO.
+    Implements the bound of Theorem 9.
 
     Args:
         k (int): Number of errors of the classifier on the sample.
