@@ -1,7 +1,8 @@
 import numpy as np
-from scipy.special import binom, betaincinv
+from scipy.special import binom
 
 from source.hypergeometric_distribution import hypergeometric_tail_inverse
+from source.binomial_distribution import binomial_tail_inverse
 
 
 def hypinv_upperbound(k, m, growth_function, delta=0.05, mprime=None, max_mprime=None):
@@ -11,10 +12,13 @@ def hypinv_upperbound(k, m, growth_function, delta=0.05, mprime=None, max_mprime
     Args:
         k (int): Number of errors of the classifier on the sample.
         m (int): Number of examples of the sample.
-        growth_function (callable): Growth function of the hypothesis class. Will receive m+mprime as input and should output a number.
+        growth_function (callable):
+            Growth function of the hypothesis class. Will receive m+mprime as input and should output a number.
         delta (float between 0 and 1): Confidence parameter.
-        mprime (int or None): Ghost sample size. If None, will be optimized for the given inputs. This requires calling growth_function 'max_mprime' times. If too slow, one can use the heuristic value of 4*m as a good guess.
-        max_mprime (int): Used when optimizing mprime. Will evaluate the best value of mprime within 1 and 'max_mprime'. If None, defaults to 15*m.
+        mprime (int or None):
+            Ghost sample size. If None, will be optimized for the given inputs. This requires calling growth_function 'max_mprime' times. If too slow, one can use the heuristic value of 4*m as a good guess.
+        max_mprime (int):
+            Used when optimizing mprime. Will evaluate the best value of mprime within 1 and 'max_mprime'. If None, defaults to 15*m.
 
     Returns epsilon, the upper bound between 0 and 1.
     """
@@ -36,10 +40,13 @@ def hypinv_reldev_upperbound(k, m, growth_function, delta=0.05, mprime=None, max
     Args:
         k (int): Number of errors of the classifier on the sample.
         m (int): Number of examples of the sample.
-        growth_function (callable): Growth function of the hypothesis class. Will receive m+mprime as input and should output a number.
+        growth_function (callable):
+            Growth function of the hypothesis class. Will receive m+mprime as input and should output a number.
         delta (float between 0 and 1): Confidence parameter.
-        mprime (int or None): Ghost sample size. If None, will be optimized for the given inputs. This requires calling growth_function 'max_mprime' times. If too slow, one can use the heuristic value of 4*m as a good guess.
-        max_mprime (int): Used when optimizing mprime. Will evaluate the best value of mprime within 1 and 'max_mprime'. If None, defaults to 15*m.
+        mprime (int or None):
+            Ghost sample size. If None, will be optimized for the given inputs. This requires calling growth_function 'max_mprime' times. If too slow, one can use the heuristic value of 4*m as a good guess.
+        max_mprime (int):
+            Used when optimizing mprime. Will evaluate the best value of mprime within 1 and 'max_mprime'. If None, defaults to 15*m.
 
     Returns epsilon, the upper bound between 0 and 1.
     """
@@ -91,7 +98,8 @@ def vapnik_pessismistic_bound(k, m, growth_function, delta):
     Args:
         k (int): Number of errors of the classifier on the sample.
         m (int): Number of examples of the sample.
-        growth_function (callable): Growth function of the hypothesis class. Will receive 2m as input and should output a number.
+        growth_function (callable):
+            Growth function of the hypothesis class. Will receive 2m as input and should output a number.
         delta (float between 0 and 1): Confidence parameter.
 
     Returns epsilon, the upper bound between 0 and 1.
@@ -107,7 +115,8 @@ def vapnik_relative_deviation_bound(k, m, growth_function, delta):
     Args:
         k (int): Number of errors of the classifier on the sample.
         m (int): Number of examples of the sample.
-        growth_function (callable): Growth function of the hypothesis class. Will receive 2m as input and should output a number.
+        growth_function (callable):
+            Growth function of the hypothesis class. Will receive 2m as input and should output a number.
         delta (float between 0 and 1): Confidence parameter.
 
     Returns epsilon, the upper bound between 0 and 1.
@@ -117,10 +126,7 @@ def vapnik_relative_deviation_bound(k, m, growth_function, delta):
     return r + 2*e*(1 + np.sqrt(1 + r/e))
 
 
-def bininv(k, m, delta):
-    return 1-betaincinv(m-k, k+1, delta)
-
-def sample_compression_bound(k, m, d, delta):
+def sample_compression_bound(k, m, d, delta, compression_scheme_prob=None):
     """
     Implements the sample compression bound.
 
@@ -129,7 +135,11 @@ def sample_compression_bound(k, m, d, delta):
         m (int): Number of examples of the sample.
         d (int): Number of examples in the compressed sample.
         delta (float between 0 and 1): Confidence parameter.
+        compression_scheme_prob (float):
+            Probability assigned to the compression scheme. Defaults to uniform distribution over compression sample sizes, i.e. 1/(m*binom(m, d)).
 
     Returns epsilon, the upper bound between 0 and 1.
     """
-    return bininv(k, m-d, delta/(m*binom(m, d)))
+    if compression_scheme_prob is None:
+        compression_scheme_prob = 1/(m*binom(m, d))
+    return binomial_tail_inverse(k, m-d, delta*compression_scheme_prob)
