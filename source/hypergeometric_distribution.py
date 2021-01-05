@@ -37,7 +37,7 @@ def hypergeometric_pmf(k, m, K, M):
 
 def hypergeometric_tail(k, m, K, M):
     """
-    Hypergeometric distribution left tail, AKA cumulative distribution function.
+    Hypergeometric distribution tail, AKA cumulative distribution function.
 
         Hyp(k, m, K, M) = Σ_(j<=k) hyp(j, m, K, M),
 
@@ -93,7 +93,7 @@ def berkopec_unnormalized_single_term(k, m, K, M):
 
 def hypergeometric_berkopec_tail(k, m, K, M):
     """
-    Hypergeometric distribution left tail, AKA cumulative distribution function using Berkopec's formula.
+    Hypergeometric distribution tail, AKA cumulative distribution function using Berkopec's formula.
 
         Hyp(k, m, K, M) = Σ_{J=K}^{M-m+k} binom(J, k) * binom(M-J-1, M-J-m+k) / binom(M, m)
 
@@ -110,7 +110,7 @@ def hypergeometric_berkopec_tail(k, m, K, M):
 
 def hypergeometric_tail_inverse(k, m, delta, M):
     """
-    Computes the pseudo-inverse of the hypergeometric distribution left tail:
+    Computes the pseudo-inverse of the hypergeometric distribution tail:
         HypInv(k, m, delta, M) = min{ K : Hyp(j, m, K, M) <= delta },
     where Hyp(k, m, K, M) is the cumulative distribution function (CDF).
 
@@ -142,7 +142,7 @@ def hypergeometric_tail_inverse(k, m, delta, M):
 
 def berkopec_hypergeometric_tail_inverse(k, m, delta, M, start='below'):
     """
-    Computes the pseudo-inverse of the hypergeometric distribution left tail:
+    Computes the pseudo-inverse of the hypergeometric distribution tail:
         HypInv(k, m, delta, M) = min{ K : Hyp(j, m, K, M) <= delta },
     where Hyp(k, m, K, M) is the cumulative distribution function (CDF).
 
@@ -190,7 +190,7 @@ def berkopec_hypergeometric_tail_inverse(k, m, delta, M, start='below'):
 
 def logberkopec_hypergeometric_tail_inverse(k, m, log_delta, M, start='below'):
     """
-    Computes the pseudo-inverse of the hypergeometric distribution left tail for a logarithmic delta term and with a logarithmic algorithm to avoid under- and overflows and less memory usage.
+    Computes the pseudo-inverse of the hypergeometric distribution tail for a logarithmic delta term and with a logarithmic algorithm to avoid under- and overflows and less memory usage.
 
     Args:
         k (int): Number of errors observed.
@@ -231,7 +231,7 @@ def naive_hypergeometric_tail_inverse(k, m, delta, M, start='below'):
     """
     NOTE: This implementation is much slower than the others.
 
-    Computes the pseudo-inverse of the hypergeometric distribution left tail:
+    Computes the pseudo-inverse of the hypergeometric distribution tail:
         HypInv(k, m, delta, M) = min{ K : Hyp(j, m, K, M) <= delta },
     where Hyp(k, m, K, M) is the cumulative distribution function (CDF).
 
