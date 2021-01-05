@@ -18,12 +18,12 @@ def test_berkopec_single_term():
     assert berkopec_single_term(k,m,K,M) == binom(K, k)*binom(M-K-1, M-K-m+k)/binom(M, m)
 
 
-def test_berkopec_formula_equals_left_tail():
+def test_berkopec_formula_equals_tail():
     k, m, K, M = 50, 200, 500, 1000
-    berkopec = hypergeometric_berkopec_left_tail(k, m, K, M)
+    berkopec = hypergeometric_berkopec_tail(k, m, K, M)
     # assert np.isclose(berkopec, hypergeometric_tail(k, m, K, M), atol=10-35, rtol=10e-20)
     k, m, K, M = 10, 200, 10, 1000
-    berkopec = hypergeometric_berkopec_left_tail(k, m, K, M)
+    berkopec = hypergeometric_berkopec_tail(k, m, K, M)
     print(f'{berkopec:e}')
     assert berkopec == 1
 

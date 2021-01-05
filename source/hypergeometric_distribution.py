@@ -91,7 +91,7 @@ def berkopec_unnormalized_single_term(k, m, K, M):
         return comb(K, k, exact=True) * comb(M-K-1, M-K-m+k, exact=True)
 
 
-def hypergeometric_berkopec_left_tail(k, m, K, M):
+def hypergeometric_berkopec_tail(k, m, K, M):
     """
     Hypergeometric distribution left tail, AKA cumulative distribution function using Berkopec's formula.
 
