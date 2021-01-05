@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.special import binom, comb, gammaln
+from scipy.special import comb, gammaln
 from scipy.stats import hypergeom
 import math
 
@@ -121,7 +121,7 @@ def hypergeometric_tail_inverse(k, m, delta, M):
         M (int): Population size.
         start (string, 'above' or 'below'): Specifies if the algorithm should approach delta from above or from below. Use 'above' if k << M - m and below otherwise. See the doc of the function 'hypergeometric_tail_inverse' for more info.
 
-    Implements a bisection algorithm to find the inverse in O(k log(M-m)), as opposed to the other algorithms which are in Θ(M-m).
+    Implements a bisection algorithm to find the pseudo-inverse in O(k log(M-m)), as opposed to the other algorithms which are in Θ(M-m). The bisection is adjusted to deal with the discrete nature of the hypergeometric tail.
 
     Returns K the number of errors in the whole population with probability 1 - delta.
     """
