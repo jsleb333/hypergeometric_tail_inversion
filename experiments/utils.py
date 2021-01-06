@@ -4,10 +4,6 @@ import numpy as np
 import numpy.random as random
 from numpy.polynomial import polynomial as poly
 
-from graal_utils import Timer
-
-from source.generalization_bounds import hypinv_upperbound, hypinv_reldev_upperbound,     vapnik_pessismistic_bound, vapnik_relative_deviation_bound, sample_compression_bound
-
 
 def make_dataset_from_polynomial(n_examples, polynomial, xmin=0, xmax=1, noise=0):
     X = random.uniform(xmin, xmax, (n_examples,1))
@@ -21,7 +17,7 @@ def make_polynomial_dataset(n_examples,
                             degree,
                             noise=.5,
                             return_poly=False,
-                            root_dist=(.1, .5),
+                            root_dist=(.5, 2),
                             root_margin=2,
                             poly_scale=1):
     # Random polynomial
@@ -36,7 +32,7 @@ def make_polynomial_dataset(n_examples,
     optima_x = polynomial.deriv().roots()
     optima_y = polynomial(np.array(optima_x))
     scale_inv = min(abs(optima_y))/poly_scale
-    polynomial = polynomial/scale_inv # Set smallest optima at .25 (arbitrary value necessary for scaled noise)
+    polynomial = polynomial/scale_inv
 
     # Generate X and Y noisy values
     xmin = roots[0] - root_margin
