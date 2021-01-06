@@ -1,7 +1,6 @@
 # VSCode project settings
 .vscode/
 .vs/
-python2latex.code-workspace
 
 # Latex
 *.tex
@@ -12,9 +11,6 @@ python2latex.code-workspace
 *.synctex(busy)
 *.fdb_latexmk
 *.fls
-
-# Exception in examples
-!*already_existing_file.tex
 
 # CSV
 *.csv
