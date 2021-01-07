@@ -4,7 +4,7 @@ import python2latex as p2l
 import numpy as np
 import pandas as pd
 
-from source.generalization_bounds import hypinv_upperbound, hypinv_reldev_upperbound,     vapnik_pessismistic_bound, vapnik_relative_deviation_bound, sample_compression_bound
+from source.generalization_bounds import hypinv_upperbound, vapnik_pessismistic_bound, vapnik_relative_deviation_bound, sample_compression_bound
 from source.utils import sauer_shelah
 
 exp_name = 'test'
@@ -12,16 +12,17 @@ n_examples = 100
 min_true_degree = 2
 max_true_degree = 4
 n_runs = 10
-noise = .5
-C = 10e5
+noise = 1.5
+C = 10e6
 delta = 0.05
 delta_d = lambda d: delta * 6 / (np.pi**2 * d**2)
+from experiments.scripts.best_mprimes import mprimes
 
 bounds = {
-    'HTI': lambda k, d: hypinv_upperbound(k, n_examples, sauer_shelah(d), delta_d(d), mprime=4*n_examples),
-    'SC': lambda k, d: sample_compression_bound(k, n_examples, d, delta_d(d)*n_examples),
-    'VP': lambda k, d: vapnik_pessismistic_bound(k, n_examples, sauer_shelah(d), delta_d(d)),
-    'VRD': lambda k, d: vapnik_relative_deviation_bound(k, n_examples, sauer_shelah(d), delta_d(d)),
+    'HTI': lambda k, d, mp: hypinv_upperbound(k, n_examples, sauer_shelah(d), delta_d(d), mprime=mp),
+    'SC': lambda k, d, mp: sample_compression_bound(k, n_examples, d, delta_d(d)*n_examples),
+    'VP': lambda k, d, mp: vapnik_pessismistic_bound(k, n_examples, sauer_shelah(d), delta_d(d)),
+    'VRD': lambda k, d, mp: vapnik_relative_deviation_bound(k, n_examples, sauer_shelah(d), delta_d(d)),
 }
 
 path = f'./experiments/results/{exp_name}/'
@@ -55,7 +56,7 @@ for true_degree in range(min_true_degree, max_true_degree+1):
             tr_risk, ts_risk = df[f'{n=}-tr-risk'], df[f'{n=}-ts-risk']
             table[n+1, 0:3] = n, np.mean(tr_risk), np.mean(ts_risk)
             n_errors = tr_risk*n_examples
-            bound_values[n-1] = [bound(int(k), n+1) for k in n_errors]
+            bound_values[n-1] = [bound(int(k), n+1, mprimes[n]) for k in n_errors]
             table[n+1, i] = np.mean(bound_values[n-1])
 
         for n in range(1, n_degrees+1):
@@ -64,6 +65,8 @@ for true_degree in range(min_true_degree, max_true_degree+1):
                 if np.argmin(bound_values[:,run])+1 == n:
                     success_rate += 1/n_runs
             table[n+1, i+1] = success_rate
+
+    table[true_degree+1].apply_command(p2l.bold)
 
 
 doc.build()
