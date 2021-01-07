@@ -40,7 +40,7 @@ def launch_single_poly(filename,
                        seed=101,
                        n_runs=3,
                        classifier_degrees=list(range(1,11)),
-                       noise=2,
+                       noise=1.5,
                        C=10e6):
     with open(filename + '.csv', 'w', newline='') as file:
         writer = csv.writer(file)
@@ -77,7 +77,7 @@ def launch_experiment(exp_name='',
                       n_examples=250,
                       min_true_degree=2,
                       max_true_degree=7,
-                      noise=2,
+                      noise=1.5,
                       C=10e6,
                       n_runs=100,
                       ):
@@ -107,10 +107,10 @@ def launch_experiment(exp_name='',
 
 
 if __name__ == "__main__":
-    launch_experiment(exp_name='test',
+    launch_experiment(exp_name=f'{format(datetime.today(), "%Y-%m-%d")}',
                       n_examples=250,
                       min_true_degree=2,
-                      max_true_degree=4,
-                      n_runs=10,
+                      max_true_degree=7,
+                      n_runs=100,
                       noise=1.5,
                       )
