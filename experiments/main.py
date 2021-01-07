@@ -17,22 +17,18 @@ from source.utils import func_to_cmd
 
 def launch_single_run(dataset, classifier_degree, C):
     (Xtr, Ytr), (Xts, Yts) = dataset
-    # n_examples = Xtr.shape[0]
-    # class_weight = {1:-np.sum(np.sign(Ytr)-1)/2/n_examples, -1: np.sum(np.sign(Ytr)+1)/2/n_examples}
-    # sample_weight = np.array([class_weight[y] for y in np.sign(Ytr)])
 
     classifier = SVC(kernel='poly', degree=1, C=C, max_iter=10e6)
     Xtr_poly = make_polynomial_features(Xtr, classifier_degree)
+    Xts_poly = make_polynomial_features(Xts, classifier_degree)
+
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore')
-        classifier.fit(Xtr_poly,
-                       np.sign(Ytr),
-                    #    sample_weight=sample_weight,
-                       )
+        classifier.fit(Xtr_poly, np.sign(Ytr))
 
     Ytr_pred = classifier.predict(Xtr_poly)
     tr_risk = 1 - accuracy_score(np.sign(Ytr), Ytr_pred)
-    Yts_pred = classifier.predict(make_polynomial_features(Xts, classifier_degree))
+    Yts_pred = classifier.predict(Xts_poly)
     ts_risk = 1 - accuracy_score(np.sign(Yts), Yts_pred)
 
     return tr_risk, ts_risk
@@ -41,11 +37,11 @@ def launch_single_run(dataset, classifier_degree, C):
 def launch_single_poly(filename,
                        n_examples,
                        true_degree,
-                       seed=11,
+                       seed=101,
                        n_runs=3,
                        classifier_degrees=list(range(1,11)),
-                       noise=0.5,
-                       C=10e5):
+                       noise=2,
+                       C=10e6):
     with open(filename + '.csv', 'w', newline='') as file:
         writer = csv.writer(file)
         _titles = [[f'{n=}-tr-risk', f'{n=}-ts-risk'] for n in classifier_degrees]
@@ -66,7 +62,7 @@ def launch_single_poly(filename,
                                                 degree=true_degree,
                                                 noise=noise,
                                                 root_dist=(.5, 2),
-                                                root_margin=2,
+                                                root_margin=1,
                                                 poly_scale=1)
 
             for classifier_degree in classifier_degrees:
@@ -81,8 +77,8 @@ def launch_experiment(exp_name='',
                       n_examples=250,
                       min_true_degree=2,
                       max_true_degree=7,
-                      noise=.5,
-                      C=10e5,
+                      noise=2,
+                      C=10e6,
                       n_runs=100,
                       ):
     """
@@ -112,9 +108,9 @@ def launch_experiment(exp_name='',
 
 if __name__ == "__main__":
     launch_experiment(exp_name='test',
-                      n_examples=100,
+                      n_examples=250,
                       min_true_degree=2,
                       max_true_degree=4,
                       n_runs=10,
-                      noise=2,
+                      noise=1.5,
                       )
