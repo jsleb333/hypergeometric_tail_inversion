@@ -43,12 +43,12 @@ def launch_single_poly(filename,
                        true_degree,
                        seed=11,
                        n_runs=3,
-                       classifier_degrees=list(range(1,10)),
-                       noise=0,
+                       classifier_degrees=list(range(1,11)),
+                       noise=0.5,
                        C=10e5):
     with open(filename + '.csv', 'w', newline='') as file:
         writer = csv.writer(file)
-        _titles = [[f'{d=}-tr-risk', f'{d=}-ts-risk', f'{d=}-bound'] for d in classifier_degrees]
+        _titles = [[f'{n=}-tr-risk', f'{n=}-ts-risk'] for n in classifier_degrees]
         titles = [t for _t in _titles for t in _t] + ['seed']
         writer.writerow(titles)
 
@@ -62,13 +62,14 @@ def launch_single_poly(filename,
             run_seed = seed + 10*run
             np.random.seed(run_seed)
 
+            dataset = make_polynomial_dataset(n_examples=n_examples,
+                                                degree=true_degree,
+                                                noise=noise,
+                                                root_dist=(.5, 2),
+                                                root_margin=2,
+                                                poly_scale=1)
+
             for classifier_degree in classifier_degrees:
-                dataset = make_polynomial_dataset(n_examples=n_examples,
-                                                  degree=true_degree,
-                                                  noise=noise,
-                                                  root_dist=(.5, 2),
-                                                  root_margin=2,
-                                                  poly_scale=1)
                 row_data.extend(launch_single_run(dataset=dataset,
                                                   classifier_degree=classifier_degree,
                                                   C=C))
@@ -98,7 +99,7 @@ def launch_experiment(exp_name='',
         with Timer(f'True degree: {true_degree}'):
             pathname = f'./experiments/results/{exp_name}/'
             os.makedirs(pathname, exist_ok=True)
-            filename = f'd={true_degree}-n={n_examples}-noise={noise}-runs={n_runs}-C={C}'
+            filename = f'n={true_degree}-m={n_examples}-noise={noise}-runs={n_runs}-C={C}'
             launch_single_poly(
                 filename=pathname+filename,
                 n_examples=n_examples,
@@ -111,8 +112,9 @@ def launch_experiment(exp_name='',
 
 if __name__ == "__main__":
     launch_experiment(exp_name='test',
-                      n_examples=10,
-                      min_true_degree=3,
-                      max_true_degree=3,
-                      n_runs=1,
+                      n_examples=100,
+                      min_true_degree=2,
+                      max_true_degree=4,
+                      n_runs=10,
+                      noise=2,
                       )
