@@ -7,11 +7,11 @@ import pandas as pd
 from source.generalization_bounds import hypinv_upperbound, vapnik_pessismistic_bound, vapnik_relative_deviation_bound, sample_compression_bound
 from source.utils import sauer_shelah
 
-exp_name = 'test'
-n_examples = 100
+exp_name = '2021-01-07'
+n_examples = 250
 min_true_degree = 2
-max_true_degree = 4
-n_runs = 10
+max_true_degree = 7
+n_runs = 100
 noise = 1.5
 C = 10e6
 delta = 0.05
@@ -37,7 +37,7 @@ for true_degree in range(min_true_degree, max_true_degree+1):
     filename = f'n={true_degree}-m={n_examples}-noise={noise}-runs={n_runs}-C={C}'
     df = pd.read_csv(path + filename + '.csv', sep=',', header=0)
 
-    table = doc.new(p2l.Table(shape=(n_rows, n_cols)))
+    table = doc.new(p2l.Table(shape=(n_rows, n_cols), label=f'{true_degree=}'))
 
     table[0:2,0].multicell('$n$', v_shift='-2pt')
     table[0:2,1].multicell('Train risk', v_shift='-2pt')
@@ -68,5 +68,8 @@ for true_degree in range(min_true_degree, max_true_degree+1):
 
     table[true_degree+1].apply_command(p2l.bold)
 
+    table.caption = fr"""Detailed experimental results for a generating polynomial of degree {true_degree} with {n_examples} examples and a noise parameter of {noise}.
+    Each row corresponds to the degree $n$ of the polynomial learned by the SVM, and presents the mean training risk, mean testing risk, mean bound value and fraction of the time this degree had the minimum bound value. The row in bold corresponds to the true degree."""
 
+print('Building...')
 doc.build()
