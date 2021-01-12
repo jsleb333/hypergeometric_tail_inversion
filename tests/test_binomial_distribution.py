@@ -1,7 +1,7 @@
 from scipy.special import binom
+import numpy as np
 
-from source.binomial_distribution import *
-
+from source.binomial_distribution import binomial_tail, binomial_tail_inverse
 
 def test_binomial_tail():
     k, m, p = 5, 13, .3
