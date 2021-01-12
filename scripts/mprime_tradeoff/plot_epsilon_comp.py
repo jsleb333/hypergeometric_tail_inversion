@@ -165,14 +165,14 @@ if __name__ == "__main__":
     filename = f'mprime_tradeoff_comp_k'
     plot = plot_comp_k(200, ks, 10, 0.05)
 
-    filename = f'mprime_tradeoff_comp_d'
-    plot = plot_comp_d(200, 0, ds, 0.05)
+    # filename = f'mprime_tradeoff_comp_d'
+    # plot = plot_comp_d(200, 0, ds, 0.05)
 
-    filename = f'mprime_tradeoff_comp_delta'
-    plot = plot_comp_delta(200, 0, 10, deltas)
+    # filename = f'mprime_tradeoff_comp_delta'
+    # plot = plot_comp_delta(200, 0, 10, deltas)
 
-    filename = f'mprime_tradeoff_comp_m'
-    plot = plot_comp_m(ms, 0, 10, 0.05)
+    # filename = f'mprime_tradeoff_comp_m'
+    # plot = plot_comp_m(ms, 0, 10, 0.05)
 
     doc = p2l.Document(filename, doc_type='standalone')
 
