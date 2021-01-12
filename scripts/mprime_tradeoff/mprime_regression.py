@@ -38,6 +38,7 @@ def plot_best_mprime(ms, risks, ds, deltas):
     # def reg(k, a, b, c, d, e, m=ms_reg):
     #     return a*np.log(1+k/b-m/c)/m + d*np.log(m)/m + e
 
+
     ys = mprimes_reg/(ms_reg*np.log(ms_reg))
 
     popt, pcov = curve_fit(reg, ks_reg, ys,
