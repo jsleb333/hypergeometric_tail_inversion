@@ -69,6 +69,7 @@ def plot_best_mprime(ms, risks, ds, deltas):
     plot.legend_position = 'north west'
     # plot.legend_position = 'south east'
     plot.axis.kwoptions['ylabel style'] = r'{rotate=-90}'
+    plot.axis.kwoptions['legend cell align'] = '{left}'
 
     plot.caption = f"$m'/m$ in function of $k/m$ with the VCdim set to $d={d}$ and $\delta={delta}$."
     plot.y_max = 10
