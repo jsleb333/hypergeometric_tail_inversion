@@ -142,4 +142,6 @@ def sample_compression_bound(k, m, d, delta, compression_scheme_prob=None):
     """
     if compression_scheme_prob is None:
         compression_scheme_prob = 1/(m*binom(m, d))
+    if k >= m-d:
+        return 1
     return binomial_tail_inverse(k, m-d, delta*compression_scheme_prob)
