@@ -90,8 +90,4 @@ doc = p2l.Document(filename, doc_type='standalone')
 doc += plot
 
 print('Building...')
-doc.build()
-
-os.remove(filename + '.log')
-os.remove(filename + '.tex')
-os.remove(filename + '.aux')
+doc.build(delete_files='all')

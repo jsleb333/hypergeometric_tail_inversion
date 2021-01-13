@@ -133,8 +133,6 @@ for classifier_degree in classifier_degrees:
 
     plot.axis += fr"\node[fill=white, draw=black, align=left, anchor=south east] at (axis cs:{x_max},{y_min}) {{\tiny train risk: {tr_risk:.2f}\\[-4pt] \tiny test risk: {ts_risk:.2f}}};"
 
-    doc.build(show_pdf=False)
+    doc.build(show_pdf=False, delete_files='all')
 
     os.remove(path+f'n={classifier_degree}.csv')
-    for ext in ['tex', 'log', 'aux']:
-        os.remove(path+f'visualization_n={classifier_degree}.{ext}')

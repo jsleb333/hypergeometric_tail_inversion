@@ -97,5 +97,5 @@ if __name__ == "__main__":
     # doc += plot_hyp_tail_delta(ks, ms, Ms)
 
     print('Building...')
-    doc.build()
+    doc.build(delete_files='all')
 

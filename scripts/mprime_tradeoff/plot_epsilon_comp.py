@@ -189,8 +189,4 @@ if __name__ == "__main__":
     doc.add_package('xcolor', 'dvipsnames')
 
     print('Building...')
-    doc.build()
-
-    os.remove(filename + '.log')
-    os.remove(filename + '.tex')
-    os.remove(filename + '.aux')
+    doc.build(delete_files='all')
