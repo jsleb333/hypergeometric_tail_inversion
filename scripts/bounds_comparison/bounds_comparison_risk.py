@@ -10,22 +10,16 @@ from source import hypinv_upperbound, hypinv_reldev_upperbound, vapnik_pessismis
 from source.utils import sauer_shelah
 
 
-m, d, delta = 500, 20, 0.05
-# mp = optimize_mprime(0, m, sauer_shelah(d), delta, max_mprime=10*m, min_mprime=3*m)
-# mp = 678 # Optimization returns this number when run with m=200, d=15 and delta=0.05
-mp = 1693 # Optimization returns this number when run with m=500, d=20 and delta=0.05
-# mp = 4071 # Optimization returns this number when run with m=1000, d=10 and delta=0.05
-# mp = 5937 # Optimization returns this number when run with m=1500, d=15 and delta=0.05
+m, d, delta = 1000, 20, 0.05
+# mp = optimize_mprime(0, m, sauer_shelah(d), delta, max_mprime=10*m, min_mprime=3*m, early_stopping=1000)
 # print(mp)
+# mp = 678 # Optimization returns this number when run with m=200, d=15 and delta=0.05
+# mp = 1693 # Optimization returns this number when run with m=500, d=20 and delta=0.05
+# mp = 4071 # Optimization returns this number when run with m=1000, d=10 and delta=0.05
+mp = 3611 # Optimization returns this number when run with m=1000, d=20 and delta=0.05
+# mp = 5937 # Optimization returns this number when run with m=1500, d=15 and delta=0.05
 # mp = m
 
-# mp_rd = optimize_mprime(0, m, sauer_shelah(d), delta, max_mprime=20*m, min_mprime=3*m, bound=hypinv_reldev_upperbound)
-# mp_rd = 2535 # Optimization returns this number when run with m=200, d=15 and delta=0.05
-mp_rd = 6007 # Optimization returns this number when run with m=500, d=20 and delta=0.05
-# mp_rd = 18012 # Optimization returns this number when run with m=1000, d=10 and delta=0.05
-# mp_rd = 20587 # Optimization returns this number when run with m=1500, d=15 and delta=0.05
-# print(mp_rd)
-# mp_rd = m
 
 plot = p2l.Plot(plot_name=f'bounds_comp_{m=}_{d=}_{delta=}',
                 plot_path='figures',
@@ -45,26 +39,26 @@ bounds = [
         "dotted"
     ),
     (
-        "HTI",
+        "HTI\\textsubscript{opti}",
         lambda k: hypinv_upperbound(k, m, sauer_shelah(d), delta, mprime=mp),
         ""
     ),
     (
-        "HTI-RD",
-        lambda k: hypinv_reldev_upperbound(k, m, sauer_shelah(d), delta, mprime=mp_rd),
-        ""
+        "HTI$_{m'=m}$",
+        lambda k: hypinv_upperbound(k, m, sauer_shelah(d), delta, mprime=m),
+        "dashed"
     ),
     (
         "VP",
-        # "Vapnik's pessimistic",
         lambda k: vapnik_pessismistic_bound(k, m, sauer_shelah(d), delta),
-        "dash dot"
+        # "dash dot"
+        ""
     ),
     (
         "VRD",
-        # "Vapnik's RD",
         lambda k: vapnik_relative_deviation_bound(k, m, sauer_shelah(d), delta),
-        "dash dot"
+        # "dash dot"
+        ""
     ),
 ]
 bounds.reverse()
@@ -74,12 +68,14 @@ for name, bound, style in bounds:
     with Timer(name):
         plot.add_plot(ks/m, [bound(k) for k in ks], style, legend=name)
 
-plot.add_plot([0,1], [0,1], 'dashed', color='gray')
+plot.add_plot([0,1], [0,1], line_width='.5pt', color='gray!50')
 
 plot.x_min = 0
 plot.x_max = 1.02
 plot.y_min = 0
-plot.y_max = 1.6
+plot.y_max = 1.02
+plot.y_ticks = np.linspace(0, 1.25, 6)
+
 plot.x_label = "Empirical risk"
 plot.y_label = 'Upper bound on the true risk'
 plot.legend_position = 'south east'
@@ -87,7 +83,7 @@ plot.legend_position = 'south east'
 
 os.chdir('./scripts/bounds_comparison/')
 
-filename = 'bounds_comparison'
+filename = 'bounds_comparison_risk'
 
 doc = p2l.Document(filename, doc_type='standalone')
 doc += plot
