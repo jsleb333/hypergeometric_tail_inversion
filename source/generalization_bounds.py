@@ -74,21 +74,29 @@ def optimize_mprime(k,
                     delta,
                     max_mprime=10_000,
                     min_mprime=1,
-                    bound=hypinv_upperbound):
-    bounds = np.ones(max_mprime)
+                    bound=hypinv_upperbound,
+                    early_stopping=np.inf,
+                    return_bound=False):
+    steps_since_last_best = 0
+    bounds = np.ones(max_mprime-min_mprime)
     best_bound = 1
-    for mprime in range(min_mprime, max_mprime+1):
+    best_mprime = min_mprime
+    for i, mprime in enumerate(range(min_mprime, max_mprime+1)):
         bound_value = bound(k, m, growth_function, delta, mprime)
-        bounds[mprime-1] = bound_value
+        bounds[i] = bound_value
         if bound_value <= best_bound:
             best_bound = bound_value
+            best_mprime = mprime
+            steps_since_last_best = 0
+        steps_since_last_best += 1
+        if steps_since_last_best >= early_stopping:
+            # print(f'early stopped after {i} iterations')
+            break
 
-    best_mprimes = []
-    for mp, bound_value in enumerate(bounds, start=1):
-        if np.isclose(bound_value, best_bound, rtol=10e-12, atol=0):
-            best_mprimes.append(mp)
-
-    return best_mprimes[len(best_mprimes)//2] # Median of the best mprimes
+    if not return_bound:
+        return best_mprime
+    else:
+        return best_mprime, best_bound
 
 
 def vapnik_pessismistic_bound(k, m, growth_function, delta):
