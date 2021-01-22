@@ -12,8 +12,9 @@
 *.fdb_latexmk
 *.fls
 
-# CSV
+# Data container
 *.csv
+*.nc
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
