@@ -32,8 +32,8 @@ if __name__ == "__main__":
     # Generates all the data and saves it
     for k, m, d, delta in params:
         filename = f'mprime_tradeoff-{m=}_{k=}_{d=}_{delta=}'
-        if os.path.exists(path + filename + '.csv'):
-            continue
+        # if os.path.exists(path + filename + '.csv'):
+        #     continue
 
         with open(path + filename + '.csv', 'w', newline='') as file:
             writer = csv.writer(file)
