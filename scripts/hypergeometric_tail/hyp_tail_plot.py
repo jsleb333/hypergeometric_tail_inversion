@@ -6,77 +6,110 @@ sys.path.append(os.getcwd())
 from source import hypergeometric_tail
 
 
-def plot_hyp_tail_k(ms, Ks, Ms):
+def plot_hyp_tail_k(m, Ks, M):
     plot = Plot(plot_name='plot_hyp_tail_k',
-                width='7.5cm',
-                height='7.5cm',
+                width='7.45cm',
+                height='7.45cm',
+                lines='.9pt',
+                marks='1.35pt',
                 as_float_env=False)
 
-    palette = iter(holi())
-    for m in ms:
-        ks = np.arange(0, m+3) - 1
-        for K in Ks:
-            M = 3*m
-            color = next(palette)
-            plot.add_plot(ks, [hypergeometric_tail(k,m,K,M) for k in ks], color=color, label=f'{m=} {K=} {M=}')
-            k0 = max(K+m-M,0)
-            plot.add_plot([k0], [hypergeometric_tail(k0,m,K,M)], 'only marks', 'mark size=2pt', color=color)
-            km = min(K,m)
-            plot.add_plot([km], [hypergeometric_tail(km,m,K,M)], 'only marks', 'mark size=2pt', color=color)
-            for i in range(3):
-                print(hypergeometric_tail(k0+i-1,m,K,M))
+    for K, color in zip(Ks, holi()):
+        ks = np.arange(0, m+1)
+        plot.add_plot(ks, [hypergeometric_tail(k,m,K,M) for k in ks], color=color, legend=f'\\scriptsize ${K=}$')
+
+    plot.legend_position = 'south east'
+    plot.x_label = '$k$'
+    plot.y_label = 'Hyp'
+    plot.axis.kwoptions['ylabel style'] = '{yshift=-.3cm}'
+    plot.axis.kwoptions['legend cell align'] = '{left}'
+
+    plot.x_min = 0
+    plot.x_max = 21
+
+    plot.y_min = 0
+    plot.y_max = 1.05
 
     return plot
 
-def plot_hyp_tail_K(ms, ks, Ms):
+
+def plot_hyp_tail_m(k, K, Ms):
+    plot = Plot(plot_name='plot_hyp_tail_m',
+                width='7.45cm',
+                height='7.45cm',
+                lines='.9pt',
+                marks='1.35pt',
+                as_float_env=False)
+
+    for M, color in zip(Ms, holi()):
+        ms = np.arange(20+1)
+        plot.add_plot(ms, [hypergeometric_tail(k,m,K,M) for m in ms], color=color, legend=f'\\scriptsize ${M=}$')
+
+    plot.legend_position = 'south west'
+    plot.x_label = '$m$'
+    plot.y_label = 'Hyp'
+    plot.axis.kwoptions['ylabel style'] = '{yshift=-.3cm}'
+    plot.axis.kwoptions['legend cell align'] = '{left}'
+
+    plot.x_min = 0
+    plot.x_max = 21
+
+    plot.y_min = 0
+    plot.y_max = 1.05
+
+    return plot
+
+
+def plot_hyp_tail_K(ks, m, M):
     plot = Plot(plot_name='plot_hyp_tail_K',
-                width='13cm',
-                height='9cm',
+                width='7.45cm',
+                height='7.45cm',
+                lines='.9pt',
+                marks='1.35pt',
                 as_float_env=False)
 
-    palette = iter(holi())
-    for m in ms:
-        M = 3*m
-        for k in ks:
-            Ks = np.arange(k, M+3) - 1
-            color = next(palette)
-            plot.add_plot(Ks, [hypergeometric_tail(k,m,K,M) for K in Ks], color=color, label=f'{m=} {k=} {M=}')
-            # k0 = max(K+m-M,0)
-            # plot.add_plot([k0], [hypergeometric_tail(k0,m,K,M)], 'only marks', 'mark size=2pt', color=color)
-            # km = min(K,m)
-            # plot.add_plot([km], [hypergeometric_tail(km,m,K,M)], 'only marks', 'mark size=2pt', color=color)
-            # for i in range(3):
-            #     print(hypergeometric_tail(k0+i-1,m,K,M))
+    for k, color in zip(ks, holi()):
+        Ks = np.arange(0, M+1)
+        plot.add_plot(Ks, [hypergeometric_tail(k,m,K,M) for K in Ks], color=color, legend=f'\\scriptsize ${k=}$')
+
+    plot.legend_position = 'north east'
+    plot.x_label = '$K$'
+    plot.y_label = 'Hyp'
+    plot.axis.kwoptions['ylabel style'] = '{yshift=-.3cm}'
+    plot.axis.kwoptions['legend cell align'] = '{left}'
+
+    plot.x_min = 0
+    plot.x_max = M+1
+
+    plot.y_min = 0
+    plot.y_max = 1.05
 
     return plot
 
-def plot_hyp_tail_M(ks, ms, Ks, max_M=300):
+
+def plot_hyp_tail_M(k, m, Ks):
     plot = Plot(plot_name='plot_hyp_tail_M',
-                width='13cm',
-                height='9cm',
+                width='7.45cm',
+                height='7.45cm',
+                lines='.9pt',
+                marks='1.35pt',
                 as_float_env=False)
 
-    for k in ks:
-        for m in ms:
-            for K in Ks:
-                Ms = np.arange(m, max_M)
-                plot.add_plot(Ms, [hypergeometric_tail(k, m, K, M) for M in Ms],
-                              label=f'{k=} {m=} {K=}')
+    Ms = np.arange(m, 3*m+1)
+    for K, color in zip(Ks, holi()):
+        plot.add_plot(Ms, [hypergeometric_tail(k,m,K,M) for M in Ms], color=color, legend=f'\\scriptsize ${K=}$')
 
-    return plot
+    plot.legend_position = 'north west'
+    plot.x_label = '$M$'
+    plot.y_label = 'Hyp'
+    plot.axis.kwoptions['ylabel style'] = '{yshift=-.3cm}'
+    plot.axis.kwoptions['legend cell align'] = '{left}'
 
-def plot_hyp_tail_delta(ks, ms, Ms):
-    plot = Plot(plot_name='plot_hyp_tail_delta',
-                width='13cm',
-                height='9cm',
-                as_float_env=False)
+    plot.x_min = m
+    plot.x_max = 3*m+1
 
-    for k in ks:
-        for m in ms:
-            for M in Ms:
-                deltas = np.linspace(10e-16, .5, 100)
-                plot.add_plot(deltas, [hypergeometric_tail(k, m, delta, M) for delta in deltas],
-                              label=f'{k=} {m=} {M=}')
+    plot.y_min = 0
+    plot.y_max = 1.05
 
     return plot
 
@@ -85,16 +118,25 @@ if __name__ == "__main__":
     import os
     os.chdir('./scripts/hypergeometric_tail/')
 
-    doc = Document('hyp_tail_plot', doc_type='article', margin='2.5cm')
-    ks = [0, 3, 5, 10]
-    ms = [20]
-    Ks = [25]
-    Ms = [50]
-    # doc += plot_hyp_tail_K(ms, ks, Ms)
-    doc += plot_hyp_tail_M(ks, ms, Ks)
+    m = 20
+    M = 40
+    k = 3
+    K = 10
 
-    # Ms = [600]
-    # doc += plot_hyp_tail_delta(ks, ms, Ms)
+    filename = 'hyp_tail_plot_k'
+    plot = plot_hyp_tail_k(m, [1, 5, 10, 17, 25], M)
+
+    # filename = 'hyp_tail_plot_capital_K'
+    # plot = plot_hyp_tail_K([0, 3, 6, 9, 12], m, M)
+
+    # filename = 'hyp_tail_plot_m'
+    # plot = plot_hyp_tail_m(k, K, [25, 30, 40, 55, 75])
+
+    # filename = 'hyp_tail_plot_capital_M'
+    # plot = plot_hyp_tail_M(k, m, [6, 9, 12, 15, 18])
+
+    doc = Document(filename, doc_type='standalone')
+    doc += plot
 
     print('Building...')
     doc.build(delete_files='all')

@@ -1,41 +1,145 @@
 import numpy as np
-from python2latex import Document, Plot
+from python2latex import Document, Plot, holi
 import os, sys
 sys.path.append(os.getcwd())
+from itertools import chain
 
 from source import hypergeometric_tail_inverse
 
 
-def plot_hyp_tail_inv_M(ks, ms, deltas, max_M=300):
-    plot = Plot(plot_name='plot_hyp_tail_inv_M',
-                width='13cm',
-                height='9cm',
+def plot_hyp_tail_inv_k(m, deltas, M):
+    plot = Plot(plot_name='plot_hyp_tail_inv_k',
+                width='7.45cm',
+                height='7.45cm',
+                lines='.9pt',
+                marks='1.35pt',
                 as_float_env=False)
 
-    for k in ks:
-        for m in ms:
-            Ms = np.arange(m+1, max_M+1)
-            for delta in deltas:
-                tau = lambda M: (np.e*M/25)**25
-                plot.add_plot(Ms, [hypergeometric_tail_inverse(k, m, delta/4/tau(M), M)-k for M in Ms],
-                              label=f'{k=} {m=} {delta=}')
+    for delta, color in zip(deltas, holi()):
+        ks = np.arange(0, m+1)
+        if delta == 1e-6:
+            legend = '10^{-6}'
+        else:
+            legend = str(delta)
 
-            plot.add_plot([Ms[0], Ms[-1]], [Ms[0]-m, Ms[-1]-m])
+        plot.add_plot(ks, [hypergeometric_tail_inverse(k,m,delta,M) for k in ks], color=color, legend=f'\\scriptsize $\\delta={legend}$')
+
+    plot.legend_position = 'south east'
+    plot.x_label = '$k$'
+    plot.y_label = r'$\overline{\textnormal{Hyp}}$'
+    plot.axis.kwoptions['ylabel style'] = '{yshift=-.3cm}'
+    plot.axis.kwoptions['legend cell align'] = '{left}'
+
+    plot.x_min = 0
+    plot.x_max = 21
+
+    plot.y_min = 0
+    plot.y_max = M+2
 
     return plot
 
-def plot_hyp_tail_inv_delta(ks, ms, Ms):
-    plot = Plot(plot_name='plot_hyp_tail_inv_delta',
-                width='13cm',
-                height='9cm',
+
+def plot_hyp_tail_inv_m(k, delta, Ms):
+    plot = Plot(plot_name='plot_hyp_tail_inv_m',
+                width='7.45cm',
+                height='7.45cm',
+                lines='.9pt',
+                marks='1.35pt',
                 as_float_env=False)
 
-    for k in ks:
-        for m in ms:
-            for M in Ms:
-                deltas = np.linspace(10e-16, .5, 100)
-                plot.add_plot(deltas, [hypergeometric_tail_inverse(k, m, delta, M) for delta in deltas],
-                              label=f'{k=} {m=} {M=}')
+    for M, color in zip(Ms, holi()):
+        ms = np.arange(k, 20+1)
+        plot.add_plot(ms, [hypergeometric_tail_inverse(k,m,delta,M) for m in ms], color=color, legend=f'\\scriptsize ${M=}$')
+
+    plot.legend_position = 'north east'
+    plot.x_label = '$m$'
+    plot.y_label = r'$\overline{\textnormal{Hyp}}$'
+    plot.axis.kwoptions['ylabel style'] = '{yshift=-.3cm}'
+    plot.axis.kwoptions['legend cell align'] = '{left}'
+
+    plot.x_min = k
+    plot.x_max = 21
+
+    plot.y_min = 0
+    plot.y_max = Ms[-1]+k+1
+
+    return plot
+
+
+def plot_hyp_tail_inv_delta(ks, m, M):
+    plot = Plot(plot_name='plot_hyp_tail_delta',
+                width='7.45cm',
+                height='7.45cm',
+                lines='.9pt',
+                marks='1.35pt',
+                as_float_env=False)
+
+    for k, color in zip(ks, holi()):
+
+        steps = []
+        delta_start, hypinv_current = 0, hypergeometric_tail_inverse(k,m,0,M)
+        deltas = [d for d in chain(np.logspace(-16, -1, 101),
+                                   np.linspace(.1, .9, 101),
+                                   reversed(1 - np.logspace(-16, -1, 101)))]
+        for delta in deltas:
+        # for delta in np.linspace(0,1,1001):
+            hypinv = hypergeometric_tail_inverse(k,m,delta,M)
+            if hypinv < hypinv_current:
+                steps.append((delta_start, delta, hypinv_current))
+                hypinv_current = hypinv
+                delta_start = delta
+        else:
+            steps.append((delta_start, delta, hypinv_current))
+
+        for delta_start, delta_end, hypinv in steps:
+            plot.add_plot([delta_start, delta_end], [hypinv, hypinv], color=color)
+            plot.add_plot([delta_end], [hypinv], color=color, mark_options='{fill=white}')
+
+        plot.axis += rf'\addlegendentry{{\scriptsize ${k=}$}}'
+        plot.axis += fr'\addlegendimage{{color={str(color)}, line width=1.35pt, mark=none}}'
+
+    plot.legend_position = 'north east'
+    plot.x_label = '$\\delta$'
+    plot.y_label = r'$\overline{\textnormal{Hyp}}$'
+    plot.axis.kwoptions['ylabel style'] = '{yshift=-.3cm}'
+    plot.axis.kwoptions['legend cell align'] = '{left}'
+
+    plot.x_min = 0
+    plot.x_max = 1.05
+
+    plot.y_min = 0
+    plot.y_max = 41
+
+    return plot
+
+
+def plot_hyp_tail_inv_M(k, m, deltas):
+    plot = Plot(plot_name='plot_hyp_tail_inv_M',
+                width='7.45cm',
+                height='7.45cm',
+                lines='.9pt',
+                marks='1.35pt',
+                as_float_env=False)
+
+    Ms = np.arange(m, 3*m+1)
+    for delta, color in zip(deltas, holi()):
+        if delta == 1e-6:
+            legend = '10^{-6}'
+        else:
+            legend = str(delta)
+        plot.add_plot(Ms, [hypergeometric_tail_inverse(k,m,delta,M) for M in Ms], color=color, legend=f'\\scriptsize $\\delta={legend}$')
+
+    plot.legend_position = 'north west'
+    plot.x_label = '$M$'
+    plot.y_label = r'$\overline{\textnormal{Hyp}}$'
+    plot.axis.kwoptions['ylabel style'] = '{yshift=-.3cm}'
+    plot.axis.kwoptions['legend cell align'] = '{left}'
+
+    plot.x_min = m
+    plot.x_max = 3*m+1
+
+    plot.y_min = 0
+    # plot.y_max = 1.05
 
     return plot
 
@@ -44,15 +148,26 @@ if __name__ == "__main__":
     import os
     os.chdir('./scripts/hypergeometric_tail/')
 
-    doc = Document('hyp_tail_inv', doc_type='standalone')
-    ks = [0, 30, 100]
-    ms = [200]
-    deltas = [.05]
-    doc += plot_hyp_tail_inv_M(ks, ms, deltas)
+    m = 20
+    M = 40
+    k = 3
+    delta = 0.05
 
-    # Ms = [600]
-    # doc += plot_hyp_tail_inv_delta(ks, ms, Ms)
+    # filename = 'hyp_tail_plot_inv_k'
+    # plot = plot_hyp_tail_inv_k(m, [1e-6, 1e-3, 0.05, .2, .5], M)
+
+    # filename = 'hyp_tail_plot_inv_m'
+    # plot = plot_hyp_tail_inv_m(k, delta, [25, 30, 40, 55, 75])
+
+    filename = 'hyp_tail_plot_inv_delta'
+    plot = plot_hyp_tail_inv_delta([0, 3, 6, 9, 12], m, M)
+
+    # filename = 'hyp_tail_plot_inv_capital_M'
+    # plot = plot_hyp_tail_inv_M(k, m, [1e-6, 1e-3, 0.05, .2, .5])
+
+    doc = Document(filename, doc_type='standalone')
+    doc.add_package('amsmath')
+    doc += plot
 
     print('Building...')
-    doc.build()
-
+    doc.build(delete_files='all')
