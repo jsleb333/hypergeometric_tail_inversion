@@ -12,7 +12,7 @@ def plot_mprime_best(ms, risks, d, delta):
                     plot_path='figures',
                     as_float_env=False,
                     width='7.45cm',
-                    height='7.45cm',
+                    height='5.45cm',
                     marks='1.5pt',
                     lines=False,
                     palette='holi5')
@@ -26,7 +26,7 @@ def plot_mprime_best(ms, risks, d, delta):
     plot.x_min = -0.05
     plot.x_max = 0.55
     plot.x_ticks = 0, .1, .2, .3, .4, .5
-    plot.x_label = r"$\displaystyle\frac{k}{m}$"
+    plot.x_label = r"$k/m$"
     plot.y_label = r"$\displaystyle\frac{m'_{\textrm{\scriptsize best}}}{m}$"
     plot.legend_position = 'north west'
     plot.axis.kwoptions['ylabel style'] = r'{rotate=-90, xshift=.3cm}'
@@ -39,6 +39,7 @@ if __name__ == "__main__":
     os.chdir('./scripts/mprime_tradeoff/')
 
     d = 10
+    # d = 35
     ms = [100, 200, 300, 500, 1000]
     risks =  np.linspace(0, .5, 11)
     delta = 0.05
