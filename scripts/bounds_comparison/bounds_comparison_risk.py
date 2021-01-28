@@ -31,42 +31,50 @@ plot.axis.kwoptions['legend style'] = r'{font=\scriptsize}'
 plot.axis.kwoptions['y label style'] = r'{yshift=-.3cm}'
 plot.axis.kwoptions['legend cell align'] = '{left}'
 
+palette = p2l.holi(5)
+
 bounds = [
     (
         "SC",
         # "Sample compression",
         lambda k: sample_compression_bound(k, m, d, delta),
-        "dotted"
+        # "dotted",
+        '',
+        palette[-1]
     ),
     (
         "HTI\\textsubscript{opti}",
         lambda k: hypinv_upperbound(k, m, sauer_shelah(d), delta, mprime=mp),
-        ""
+        "",
+        palette[-2]
     ),
     (
         "HTI$_{m'=m}$",
         lambda k: hypinv_upperbound(k, m, sauer_shelah(d), delta, mprime=m),
-        "dashed"
+        "dashed",
+        palette[-2]
     ),
     (
         "VP",
         lambda k: vapnik_pessismistic_bound(k, m, sauer_shelah(d), delta),
         # "dash dot"
-        ""
+        "",
+        palette[1]
     ),
     (
         "VRD",
         lambda k: vapnik_relative_deviation_bound(k, m, sauer_shelah(d), delta),
         # "dash dot"
-        ""
+        "",
+        palette[0]
     ),
 ]
 bounds.reverse()
 
-ks = np.arange(0, m, 1)
-for name, bound, style in bounds:
+ks = np.arange(0, m, 5)
+for name, bound, style, color in bounds:
     with Timer(name):
-        plot.add_plot(ks/m, [bound(k) for k in ks], style, legend=name)
+        plot.add_plot(ks/m, [bound(k) for k in ks], style, color=color, legend=name)
 
 plot.add_plot([0,1], [0,1], line_width='.5pt', color='gray!50')
 

@@ -22,7 +22,7 @@ os.chdir('./scripts/bounds_comparison/')
 path = './data/'
 os.makedirs(path, exist_ok=True)
 
-filename = f'best_mprimes{risk=}_{d=}_{delta=}.csv'
+filename = f'best_mprimes_{risk=}_{d=}_{delta=}.csv'
 
 if os.path.exists(path + filename):
     df = pd.read_csv(path + filename, sep=',', header=0)
@@ -44,8 +44,8 @@ with Timer():
     for i, m in enumerate(ms):
         if m > current_m:
             if m <= 100:
-                hti_mp_init = m
-                htird_mp_init = m
+                hti_mp_init = 3*m
+                htird_mp_init = 6*m
             else:
                 hti_mp_init = hti_mp - 100
                 htird_mp_init = htird_mp - 100
@@ -70,11 +70,11 @@ with Timer():
                                         max_mprime=htird_mp_init*100,
                                         min_mprime=htird_mp_init,
                                         bound=hypinv_reldev_upperbound,
-                                        early_stopping=200,
+                                        early_stopping=500,
                                         return_bound=True,
                                         )
 
-            row = [m, hti_mp, hti_bound, htird_mp, hti_bound]
+            row = [m, hti_mp, hti_bound, htird_mp, htird_bound]
             csvwriter.writerow(row)
             file.flush()
             print(f'Optimized {m=} in {time()-t0:.3f}s, {i+1}/{len(ms)} done.', end='\r')
