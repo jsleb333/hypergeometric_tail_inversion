@@ -78,7 +78,7 @@ def optimize_mprime(k,
                     early_stopping=np.inf,
                     return_bound=False):
     steps_since_last_best = 0
-    bounds = np.ones(max_mprime-min_mprime)
+    bounds = np.ones(max_mprime - min_mprime + 1)
     best_bound = 1
     best_mprime = min_mprime
     for i, mprime in enumerate(range(min_mprime, max_mprime+1)):

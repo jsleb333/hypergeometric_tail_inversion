@@ -56,7 +56,7 @@ mp = ms[0]
 for i, m in enumerate(ms):
     k = int(risk*m)
     # with Timer(f'{m=}'):
-        # if m < 100:
+        # if m <= 100:
         #     min_mprime = m
         # else:
         #     min_mprime = mp-100
