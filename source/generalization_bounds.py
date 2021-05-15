@@ -153,3 +153,73 @@ def sample_compression_bound(k, m, d, delta, compression_scheme_prob=None):
     if k >= m-d:
         return 1
     return binomial_tail_inverse(k, m-d, delta*compression_scheme_prob)
+
+
+def catoni_4_2(k, m, d, delta, mprime):
+    """
+    Implements Theorem 4.2 of Catoni (2004) - Improved VC Bounds
+
+    Args:
+        k (int): Number of errors of the classifier on the sample.
+        m (int): Number of examples of the sample.
+        d (int): Number of examples in the compressed sample.
+        delta (float between 0 and 1): Confidence parameter.
+        mprime (int): Ghost sample size.
+
+    Returns epsilon, the upper bound between 0 and 1.
+    """
+
+    # Converting to Catoni's notation
+    r1 = k/m # Empirical risk
+    N = m # Number of examples
+    h = d # VC dimension
+    k = mprime/m
+    epsilon = delta
+
+    d_star = h * np.log(np.e*(k+1)*N/h) - np.log(epsilon)
+    dprime = d_star*(1+1/k)**2 * (1 + np.log(2*np.e*np.sqrt(d_star/np.pi))/(2*d_star))**2
+
+    B = 1/(1+2*dprime/N) * \
+        (r1 + dprime/N + np.sqrt(
+            2*dprime*r1*(1-r1)/N + dprime**2/N**2
+        ))
+
+    if r1 <= 1/2 and B <= 1/2:
+        return B
+    else:
+        return 1
+
+
+def catoni_4_6(k, m, d, delta, mprime):
+    """Theorem 4.6 of Catoni (2004) - Improved VC Bounds
+
+    Args:
+        k (int): Number of errors of the classifier on the sample.
+        m (int): Number of examples of the sample.
+        d (int): Number of examples in the compressed sample.
+        delta (float between 0 and 1): Confidence parameter.
+        mprime (int): Ghost sample size.
+
+    Returns epsilon, the upper bound between 0 and 1.
+    """
+
+    # Converting to Catoni's notation
+    r1 = k/m # Empirical risk
+    N = m # Number of examples
+    h = d # VC dimension
+    k = mprime/m
+    epsilon = delta
+
+    d_star = h * np.log(np.e*(k+1)*N/h) - np.log(epsilon)
+    d_prime = d_star * (1+1/k)**2
+
+    B = 1/(1+2*d_prime/N) * \
+        (r1 + d_prime/N + np.sqrt(
+            2*d_prime*r1*(1-r1)/N + d_prime**2/N**2
+        ))
+
+    if r1 <= 1/2 and B <= 1/2:
+        return B
+    else:
+        return 1
+
