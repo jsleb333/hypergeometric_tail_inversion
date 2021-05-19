@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.special import binom
+from scipy.special import binom, erfc
 
 from source.hypergeometric_distribution import hypergeometric_tail_inverse
 from source.binomial_distribution import binomial_tail_inverse
@@ -184,13 +184,13 @@ def catoni_4_2(k, m, d, delta, mprime):
             2*dprime*r1*(1-r1)/N + dprime**2/N**2
         ))
 
-    if r1 <= 1/2 and B <= 1/2:
-        return B
-    else:
-        return 1
+    for i, r in enumerate(B):
+        if r > 1/2 or B[i] > 1/2:
+            B[i] = 1
+    return B
 
 
-def catoni_4_6(k, m, d, delta, mprime):
+def catoni_4_6(k, m, d, delta, mprime=None, max_mprime=None):
     """Theorem 4.6 of Catoni (2004) - Improved VC Bounds
 
     Args:
@@ -202,6 +202,19 @@ def catoni_4_6(k, m, d, delta, mprime):
 
     Returns epsilon, the upper bound between 0 and 1.
     """
+    if mprime is None: # Must optimize
+        if max_mprime is None:
+            max_mprime = 100*m
+        best_bound = 1
+        current_bound = 1
+        mprime = m
+        while best_bound >= current_bound and mprime <= max_mprime:
+            current_bound = catoni_4_6(k, m, d, delta, mprime)
+            if current_bound < best_bound:
+                best_bound = current_bound
+            mprime += m
+
+        return best_bound
 
     # Converting to Catoni's notation
     r1 = k/m # Empirical risk
@@ -214,12 +227,34 @@ def catoni_4_6(k, m, d, delta, mprime):
     d_prime = d_star * (1+1/k)**2
 
     B = 1/(1+2*d_prime/N) * \
-        (r1 + d_prime/N + np.sqrt(
-            2*d_prime*r1*(1-r1)/N + d_prime**2/N**2
+        (r1 + d_prime/N + 1/N*np.sqrt(
+            2*d_prime*r1*(1-r1)*N + d_prime**2
         ))
 
-    if r1 <= 1/2 and B <= 1/2:
-        return B
-    else:
-        return 1
+    if r1 > 1/2 or B > 1/2:
+        B = 1
+    return B
+    # for i, r in enumerate(B):
+    #     if r > 1/2 or B[i] > 1/2:
+    #         B[i] = 1
+    # return B
 
+
+def lugosi_chaining(k, m, d, delta):
+    """Theorem 1.16 of Lugosi (2002) - Pattern classification and learning theory
+
+    Args:
+        k (int): Number of errors of the classifier on the sample.
+        m (int): Number of examples of the sample.
+        d (int): Number of examples in the compressed sample.
+        delta (float between 0 and 1): Confidence parameter.
+        mprime (int): Ghost sample size.
+
+    Returns epsilon, the upper bound between 0 and 1.
+    """
+
+    a = (d+1)*(np.log(2)+2)/(2*d)
+
+    epsilon = 24 / np.sqrt(m) * np.sqrt(2*d) * (np.sqrt(a) + np.sqrt(np.pi)*np.exp(a)/2 * erfc(np.sqrt(a)))
+
+    return k/m + epsilon + np.sqrt(-np.log(delta)/(2*m))
