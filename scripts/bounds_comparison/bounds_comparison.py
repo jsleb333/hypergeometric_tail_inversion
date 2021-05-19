@@ -6,7 +6,7 @@ import python2latex as p2l
 from graal_utils import Timer
 
 from source import optimize_mprime
-from source import hypinv_upperbound, hypinv_reldev_upperbound, vapnik_pessismistic_bound, vapnik_relative_deviation_bound, sample_compression_bound, catoni_4_2, catoni_4_6
+from source import hypinv_upperbound, hypinv_reldev_upperbound, vapnik_pessismistic_bound, vapnik_relative_deviation_bound, sample_compression_bound, catoni_4_2, catoni_4_6, lugosi_chaining
 from source.utils import sauer_shelah
 
 
@@ -70,9 +70,9 @@ bounds = [
         "dash dot"
     ),
     (
-        "C4.2",
-        # "Catoni's Inductive Bound",
-        lambda k: catoni_4_2(k, m, d, delta, mprime=19*m),
+        "L1.16",
+        # "Lugosi's chaining bound",
+        lambda k: lugosi_chaining(k, m, d, delta),
         ""
     ),
     (
@@ -96,7 +96,7 @@ plot.add_plot([0,1], [0,1], 'dashed', color='gray')
 plot.x_min = 0
 plot.x_max = 1.02
 plot.y_min = 0
-plot.y_max = 1.6
+# plot.y_max = 1.6
 plot.x_label = "Empirical risk"
 plot.y_label = 'Upper bound on the true risk'
 plot.legend_position = 'south east'
