@@ -1,3 +1,5 @@
+import os, sys
+sys.path.append(os.getcwd())
 import numpy as np
 
 from source import *
@@ -9,7 +11,7 @@ k, m, M = 20, 2000, 10000
 delta = .05/(4*(np.e*M/d)**d)
 # log_delta = np.log(.05/4) - d*np.log(np.e*M/d)
 
-N = 1
+N = 10
 
 with Timer('bisect') as t:
     for _ in range(N):

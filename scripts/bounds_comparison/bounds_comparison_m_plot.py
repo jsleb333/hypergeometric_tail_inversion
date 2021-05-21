@@ -6,31 +6,30 @@ import pandas as pd
 import python2latex as p2l
 from graal_utils import Timer, timed
 
-from source import optimize_mprime
-from source import hypinv_upperbound, hypinv_reldev_upperbound, vapnik_pessismistic_bound, vapnik_relative_deviation_bound, sample_compression_bound, lugosi_chaining, catoni_4_6
+from source import optimize_mprime, optimize_catoni
+from source import hypinv_upperbound, vapnik_pessismistic_bound, vapnik_relative_deviation_bound, catoni_4_6
 from source.utils import sauer_shelah
 
 
-risk, d, delta = 0.1, 20, 0.05
-ms = np.array(list(range(20, 400, 10))
-              + list(range(400, 1000, 50))
-              + list(range(1000, 10_000, 100))
-              + list(range(10_000, 40_001, 1000))
-              )
+risk, d, delta = 0.05, 50, 0.05
+print(f'{risk=}, {d=}, {delta=}')
+ms = np.array(
+    list(range(d, 500, 10))
+    + list(range(500, 1000, 50))
+    + [int(m) for m in np.logspace(10, 20, num=40, base=2)]
+)
 ks = np.array([int(risk*m) for m in ms])
 
 os.chdir('./scripts/bounds_comparison/')
-path = './data/'
-os.makedirs(path, exist_ok=True)
-filename = f'best_mprimes_{risk=}_{d=}_{delta=}.csv'
-df = pd.read_csv(path + filename, sep=',', header=0)
+# path = './data/'
+# os.makedirs(path, exist_ok=True)
+# filename = f'best_mprimes_{risk=}_{d=}_{delta=}.csv'
+# df = pd.read_csv(path + filename, sep=',', header=0)
 
 
-plot = p2l.Plot(plot_name=f'growth_rates_{d=}_{delta=}',
+plot = p2l.Plot(plot_name=f'bounds_comp_m_{d=}_{delta=}',
                 plot_path='figures',
                 as_float_env=False,
-                # width='15cm',
-                # height='15cm',
                 width='7.45cm',
                 height='6cm',
                 lines='1pt',
@@ -42,10 +41,9 @@ plot.axis.kwoptions['legend style'] = r'{font=\scriptsize}'
 plot.axis.kwoptions['y label style'] = r'{yshift=-.2cm}'
 plot.axis.kwoptions['legend cell align'] = '{left}'
 
-plot.x_min = 20
-plot.x_max = max(ms)
+plot.x_min = d
+plot.x_max = 1e6
 plot.y_min = 0
-# plot.y_max = 10
 plot.y_max = 1.1
 plot.x_label = "Sample size $m$"
 plot.y_label = 'Upper bound on $R_\mathcal{D}(h) - R_S(h)$'
@@ -60,50 +58,49 @@ plot.legend_position = 'south west'
 #               legend='Lugosi')
 
 # VRD
-print('VRD')
-plot.add_plot(ms,
-              vapnik_relative_deviation_bound(ks, ms, sauer_shelah(d), delta)-risk,
-              legend='VRD')
+with Timer('VRD'):
+    plot.add_plot(ms,
+                vapnik_relative_deviation_bound(ks, ms, sauer_shelah(d), delta)-risk,
+                legend='VRD')
 
 # VP
-print('VP')
-plot.add_plot(ms,
-              vapnik_pessismistic_bound(ks, ms, sauer_shelah(d), delta)-risk,
-              legend='VP')
+with Timer('VP'):
+    plot.add_plot(ms,
+                vapnik_pessismistic_bound(ks, ms, sauer_shelah(d), delta)-risk,
+                legend='VP')
 
 # Catoni
-print('C4.6')
-plot.add_plot(ms,
-              [catoni_4_6(k, m, d, delta)-risk for k, m in zip(ks, ms)],
-            #   'dotted',
-              legend='C4.6')
+with Timer('C4.6'):
+    plot.add_plot(ms,
+                [catoni_4_6(k, m, d, delta, mprime=optimize_catoni(k, m, d, delta)[1])-risk for k, m in zip(ks, ms)],
+                legend='C4.6')
 
 # HTI
-print('HTI')
-plot.add_plot(ms,
-              df['HTI-bound']-risk,
-              legend='HTI')
+with Timer('HTI'):
+    def mprime(k, m):
+        # return sum(coef*param for coef, param in zip(np.polyfit([d, 1e6], [3.5*m, 9*m], 1), [m, 1]))
+        best_mp = int(3.25*m)
+        best_bound = 1
+        for mp in np.linspace(3.25*m, 10*m, num=(10-3)*4):
+            mp = int(mp)
+            bound = hypinv_upperbound(k, m, sauer_shelah(d), delta, mp)
+            if bound < best_bound:
+                best_bound = bound
+                best_mp = mp
+            # elif bound > best_bound:
+            #     break
+        # print(m, best_mp)
+        return best_mp
 
-# # HTI-RD
-# print('HTI-RD')
-# mps = df['HTI-RD-mprime']
-# bounds = [hypinv_reldev_upperbound(k, m, sauer_shelah(d), delta, mprime=mp) for k, m, mp in zip(ks, ms, mps)]
-# bounds = np.array([b if b < 1 else 1 for b in bounds])
-# plot.add_plot(ms,
-#               bounds-risk,
-#             #   'dashed',
-#               legend='HTI-RD')
+    plot.add_plot(ms,
+                  [hypinv_upperbound(k, m, sauer_shelah(d), delta, mprime=mprime(k, m))-risk for k, m in zip(ks, ms)],
+                  #   df['HTI-bound']-risk,
+                  legend='HTI')
 
-# # SC
-# print('SC')
-# plot.add_plot(ms,
-#               [sample_compression_bound(k, m, d, delta)-risk for k, m in zip(ks, ms)],
-#             #   'dotted',
-#               legend='SC')
 
 plot.add_plot(ms, np.sqrt(d/ms), color='gray', line_width='.5pt', legend=r'\scalebox{.8}{\normalsize $\sqrt{d/m}$}')
 
-filename = 'bounds_comparison_m_opti'
+filename = 'bounds_comparison_m'
 doc = p2l.Document(filename, doc_type='standalone')
 doc.add_package('mathalfa', cal='dutchcal', scr='boondox')
 doc.add_package('times')

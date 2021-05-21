@@ -119,7 +119,6 @@ def hypergeometric_tail_inverse(k, m, delta, M):
         m (int): Sample size.
         delta (float in (0,1)): Confidence parameter threshold.
         M (int): Population size.
-        start (string, 'above' or 'below'): Specifies if the algorithm should approach delta from above or from below. Use 'above' if k << M - m and below otherwise. See the doc of the function 'hypergeometric_tail_inverse' for more info.
 
     Implements a bisection algorithm to find the pseudo-inverse in O(k log(M-m)), as opposed to the other algorithms which are in Θ(M-m). The bisection is adjusted to deal with the discrete nature of the hypergeometric tail.
 
