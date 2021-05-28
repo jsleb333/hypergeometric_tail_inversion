@@ -1,11 +1,8 @@
 import numpy as np
 import csv
-from itertools import product
 import os, sys
 sys.path.append(os.getcwd())
 from graal_utils import Timer
-import pandas as pd
-import xarray as xr
 
 from source import hypinv_reldev_upperbound
 from source.utils import sauer_shelah

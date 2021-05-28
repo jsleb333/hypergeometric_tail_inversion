@@ -3,10 +3,9 @@ import os, sys
 sys.path.append(os.getcwd())
 
 import python2latex as p2l
-from graal_utils import Timer, timed
+from graal_utils import Timer
 
-from source import optimize_mprime
-from source import hypinv_upperbound, hypinv_reldev_upperbound, vapnik_pessismistic_bound, vapnik_relative_deviation_bound, sample_compression_bound, catoni_4_6, lugosi_chaining
+from source import hypinv_upperbound, sample_compression_bound
 from source.utils import sauer_shelah
 
 
