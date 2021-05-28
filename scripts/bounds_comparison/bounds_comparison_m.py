@@ -39,11 +39,6 @@ def plot_comp_m(risk, d, delta=0.05):
     plot.x_label = "Sample size $m$"
     plot.y_label = 'Upper bound on $R_\mathcal{D}(h) - R_S(h)$'
     plot.legend_position = 'south west'
-    # plot.legend_position = 'north east'
-
-    # # Lugosi
-    # with Timer('LC'):
-    #     plot.add_plot(ms, lugosi_chaining(ks, ms, d, delta)-risk, legend='Lugosi')
 
     # VRD
     with Timer('VRD'):
@@ -66,7 +61,6 @@ def plot_comp_m(risk, d, delta=0.05):
     # HTI
     with Timer('HTI'):
         def mprime(k, m):
-            # return sum(coef*param for coef, param in zip(np.polyfit([d, 1e6], [3.5*m, 9*m], 1), [m, 1]))
             best_mp = int(3.25*m)
             best_bound = 1
             for ratio in np.arange(3.25, 13, step=.25):
@@ -77,7 +71,6 @@ def plot_comp_m(risk, d, delta=0.05):
                     best_mp = mp
                 elif bound > best_bound:
                     break
-            # print(m, best_mp, best_mp/m)
             return best_mp
 
         bound_values = np.array([hypinv_upperbound(k, m, sauer_shelah(d), delta, mprime=mprime(k, m)) for k, m in zip(ks, ms)])

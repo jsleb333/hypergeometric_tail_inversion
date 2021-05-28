@@ -18,6 +18,7 @@ The code is split into 2 parts: the 'source' directory and the 'scripts' directo
 The source files implements the utilities regarding the hypergeometric distribution (to compute the tail and its inverse), the binomial distribution (reimplementing the inverse as the scipy version suffered from numerical unstabilities) and the generalization bounds used in the paper.
 
 The scripts files uses the source files to produce the figures found in the paper.
+All figures are generated directly in LaTeX using the package `python2latex`.
 To run a script, navigate from the command line to the directory root directory of the project and run the command
 ```
 python "./scripts/<dir_name>/<file_name>.py"

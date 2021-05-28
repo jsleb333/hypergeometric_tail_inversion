@@ -23,8 +23,6 @@ def plot_comp_d(risk, m, delta=0.05):
                     width='7.45cm',
                     height='6cm',
                     lines='1pt',
-                    # xmode='log',
-                    # ymode='log',
                     palette=reversed(p2l.holi(4))
                     )
     plot.axis.kwoptions['legend style'] = r'{font=\scriptsize}'
@@ -61,7 +59,6 @@ def plot_comp_d(risk, m, delta=0.05):
     # HTI
     with Timer('HTI'):
         def mprime(d):
-            # return sum(coef*param for coef, param in zip(np.polyfit([d, 1e6], [3.5*m, 9*m], 1), [m, 1]))
             best_mp = int(3.25*m)
             best_bound = 1
             for ratio in np.arange(3.25, 13, step=.25):
@@ -72,7 +69,6 @@ def plot_comp_d(risk, m, delta=0.05):
                     best_mp = mp
                 elif bound > best_bound:
                     break
-            # print(m, best_mp, best_mp/m)
             return best_mp
 
         bound_values = np.array([hypinv_upperbound(k, m, sauer_shelah(d), delta, mprime=mprime(d)) for d in ds])

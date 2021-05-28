@@ -48,8 +48,6 @@ for name, bound, _ in bounds:
 plot = p2l.Plot(plot_name=f'sc_comp_m_{d=}_{delta=}',
                 plot_path='figures',
                 as_float_env=False,
-                # width='15cm',
-                # height='15cm',
                 width='7.45cm',
                 height='6cm',
                 lines='1pt',
@@ -64,12 +62,10 @@ plot.axis.kwoptions['legend cell align'] = '{left}'
 plot.x_min = d
 plot.x_max = 1e6
 plot.y_min = 0
-# plot.y_max = 10
 plot.y_max = 1.1
 plot.x_label = "Sample size $m$"
 plot.y_label = 'Upper bound on $R_\mathcal{D}(h) - R_S(h)$'
 plot.legend_position = 'south west'
-# plot.legend_position = 'north east'
 
 
 for name, _, style in bounds:

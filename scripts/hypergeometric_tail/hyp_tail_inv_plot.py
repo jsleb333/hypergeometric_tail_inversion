@@ -82,7 +82,6 @@ def plot_hyp_tail_inv_delta(ks, m, M):
                                    np.linspace(.1, .9, 101),
                                    reversed(1 - np.logspace(-16, -1, 101)))]
         for delta in deltas:
-        # for delta in np.linspace(0,1,1001):
             hypinv = hypergeometric_tail_inverse(k,m,delta,M)
             if hypinv < hypinv_current:
                 steps.append((delta_start, delta, hypinv_current))
@@ -139,7 +138,6 @@ def plot_hyp_tail_inv_M(k, m, deltas):
     plot.x_max = 3*m+1
 
     plot.y_min = 0
-    # plot.y_max = 1.05
 
     return plot
 
