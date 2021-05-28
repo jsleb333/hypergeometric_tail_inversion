@@ -5,7 +5,13 @@ from source.hypergeometric_distribution import hypergeometric_tail_inverse
 from source.binomial_distribution import binomial_tail_inverse
 
 
-def hypinv_upperbound(k, m, growth_function, delta=0.05, mprime=None, max_mprime=None):
+def hypinv_upperbound(k,
+                      m,
+                      growth_function,
+                      delta=0.05,
+                      mprime=None,
+                      max_mprime=None,
+                      log_delta=False):
     """
     Implements the bound of Theorem 8.
 
@@ -14,11 +20,13 @@ def hypinv_upperbound(k, m, growth_function, delta=0.05, mprime=None, max_mprime
         m (int): Number of examples of the sample.
         growth_function (callable):
             Growth function of the hypothesis class. Will receive m+mprime as input and should output a number.
-        delta (float between 0 and 1): Confidence parameter.
+        delta (float): Confidence parameter.
         mprime (int or None):
             Ghost sample size. If None, will be optimized for the given inputs. This requires calling growth_function 'max_mprime' times. If too slow, one can use the heuristic value of 4*m as a good guess.
         max_mprime (int):
             Used when optimizing mprime. Will evaluate the best value of mprime within 1 and 'max_mprime'. If None, defaults to 15*m.
+        log_delta (bool):
+            If True, it is assumed parameter 'delta' and 'growth_function' are respectively the logarithm of delta and of the growth function (to avoid overflow).
 
     Returns epsilon, the upper bound between 0 and 1.
     """
@@ -28,12 +36,23 @@ def hypinv_upperbound(k, m, growth_function, delta=0.05, mprime=None, max_mprime
     if mprime is None:
         if max_mprime is None:
             max_mprime = 15*m
-        mprime = optimize_mprime(k, m, growth_function, delta, max_mprime)
+        mprime = optimize_mprime(k=k, m=m, growth_function=growth_function, delta=delta, max_mprime=max_mprime, log_delta=log_delta)
 
-    return max(1, hypergeometric_tail_inverse(k, m, delta/4/growth_function(m+mprime), m+mprime) - 1 - k)/mprime
+    if log_delta:
+        delta = delta - np.log(4) - growth_function(m+mprime)
+    else:
+        delta = delta/4/growth_function(m+mprime)
+
+    return max(1, hypergeometric_tail_inverse(k, m, delta, m+mprime, log_delta)-1-k)/mprime
 
 
-def hypinv_reldev_upperbound(k, m, growth_function, delta=0.05, mprime=None, max_mprime=None):
+def hypinv_reldev_upperbound(k,
+                             m,
+                             growth_function,
+                             delta=0.05,
+                             mprime=None,
+                             max_mprime=None,
+                             log_delta=False):
     """
     Implements the bound of Theorem 9.
 
@@ -47,6 +66,8 @@ def hypinv_reldev_upperbound(k, m, growth_function, delta=0.05, mprime=None, max
             Ghost sample size. If None, will be optimized for the given inputs. This requires calling growth_function 'max_mprime' times. If too slow, one can use the heuristic value of 4*m as a good guess.
         max_mprime (int):
             Used when optimizing mprime. Will evaluate the best value of mprime within 1 and 'max_mprime'. If None, defaults to 15*m.
+        log_delta (bool):
+            If True, it is assumed parameter 'delta' and 'growth_function' are respectively the logarithm of delta and of the growth function (to avoid overflow).
 
     Returns epsilon, the upper bound between 0 and 1.
     """
@@ -56,15 +77,20 @@ def hypinv_reldev_upperbound(k, m, growth_function, delta=0.05, mprime=None, max
     if mprime is None:
         if max_mprime is None:
             max_mprime = 15*m
-        mprime = optimize_mprime(k, m, growth_function, delta, max_mprime, hypinv_reldev_upperbound)
+        mprime = optimize_mprime(k=k, m=m, growth_function=growth_function, delta=delta, max_mprime=max_mprime, bound=hypinv_reldev_upperbound, log_delta=log_delta)
 
     M = m + mprime
 
-    tau = growth_function(M)
+    if log_delta:
+        delta = delta - np.log(4) - growth_function(M)
+    else:
+        delta = delta/4/growth_function(M)
+
     eta = 0
     if k != m:
-        u = hypergeometric_tail_inverse(k, m, delta/(4*tau), M) - 1
+        u = hypergeometric_tail_inverse(k, m, delta, M, log_delta) - 1
         eta = max(1/np.sqrt(mprime), (M)/mprime*np.sqrt(u/M - 2*k/m + k**2/m**2/u*M))
+
     return k/m + eta**2/2 + eta/2 * np.sqrt(eta**2 + 4*k/m)
 
 
@@ -76,13 +102,14 @@ def optimize_mprime(k,
                     min_mprime=1,
                     bound=hypinv_upperbound,
                     early_stopping=np.inf,
-                    return_bound=False):
+                    return_bound=False,
+                    log_delta=False):
     steps_since_last_best = 0
     bounds = np.ones(max_mprime - min_mprime + 1)
     best_bound = 1
     best_mprime = min_mprime
     for i, mprime in enumerate(range(min_mprime, max_mprime+1)):
-        bound_value = bound(k, m, growth_function, delta, mprime)
+        bound_value = bound(k, m, growth_function, delta, mprime, log_delta=log_delta)
         bounds[i] = bound_value
         if bound_value <= best_bound:
             best_bound = bound_value
@@ -99,7 +126,7 @@ def optimize_mprime(k,
         return best_mprime, best_bound
 
 
-def vapnik_pessismistic_bound(k, m, growth_function, delta):
+def vapnik_pessismistic_bound(k, m, growth_function, delta, log_delta=False):
     """
     Implements the Vapnik's pessimistic bound.
 
@@ -108,15 +135,21 @@ def vapnik_pessismistic_bound(k, m, growth_function, delta):
         m (int): Number of examples of the sample.
         growth_function (callable):
             Growth function of the hypothesis class. Will receive 2m as input and should output a number.
-        delta (float between 0 and 1): Confidence parameter.
+        delta (float): Confidence parameter.
+        log_delta (bool):
+            If True, it is assumed parameter 'delta' and 'growth_function' are respectively the logarithm of delta and of the growth function (to avoid overflow).
 
     Returns epsilon, the upper bound between 0 and 1.
     """
-    e = (np.log(4) + np.log(growth_function(2*m)) - np.log(delta))/m
+    if log_delta:
+        e = (np.log(4) + growth_function(2*m) - delta)/m
+    else:
+        e = (np.log(4) + np.log(growth_function(2*m)) - np.log(delta))/m
+
     return (k+1)/m + np.sqrt(e)
 
 
-def vapnik_relative_deviation_bound(k, m, growth_function, delta):
+def vapnik_relative_deviation_bound(k, m, growth_function, delta, log_delta=False):
     """
     Implements the Vapnik's relative deviation bound.
 
@@ -125,11 +158,16 @@ def vapnik_relative_deviation_bound(k, m, growth_function, delta):
         m (int): Number of examples of the sample.
         growth_function (callable):
             Growth function of the hypothesis class. Will receive 2m as input and should output a number.
-        delta (float between 0 and 1): Confidence parameter.
+        delta (float): Confidence parameter.
+        log_delta (bool):
+            If True, it is assumed parameter 'delta' and 'growth_function' are respectively the logarithm of delta and of the growth function (to avoid overflow).
 
     Returns epsilon, the upper bound between 0 and 1.
     """
-    e = (np.log(4) + np.log(growth_function(2*m)) - np.log(delta))/m
+    if log_delta:
+        e = (np.log(4) + growth_function(2*m) - delta)/m
+    else:
+        e = (np.log(4) + np.log(growth_function(2*m)) - np.log(delta))/m
     r = k/m
     return r + 2*e*(1 + np.sqrt(1 + r/e))
 
