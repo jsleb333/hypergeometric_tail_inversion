@@ -1,7 +1,5 @@
 numpy
 scipy
-itertools
-csv
 python2latex==0.4.0
 colorama
 git+https://github.com/GRAAL-Research/graal-utils

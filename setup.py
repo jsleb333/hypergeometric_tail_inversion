@@ -17,11 +17,9 @@ setuptools.setup(
     install_requires=[
         'numpy',
         'scipy',
-        'itertools',
-        'csv',
         'python2latex==0.4.0',
         'colorama',
-        'git+https://github.com/GRAAL-Research/graal-utils',
+        'graal_utils @ git+https://github.com/GRAAL-Research/graal-utils.git',
         'pandas',
         'xarray',
     ],
