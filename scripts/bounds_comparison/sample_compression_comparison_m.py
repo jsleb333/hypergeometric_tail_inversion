@@ -5,8 +5,8 @@ sys.path.append(os.getcwd())
 import python2latex as p2l
 from graal_utils import Timer
 
-from source import hypinv_upperbound, sample_compression_bound
-from source.utils import sauer_shelah
+from hypergeo import hypinv_upperbound, sample_compression_bound
+from hypergeo.utils import sauer_shelah
 
 
 risk, d, delta = 0.1, 50, 0.05

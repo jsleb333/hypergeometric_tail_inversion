@@ -7,7 +7,7 @@ import warnings
 warnings.filterwarnings('error')
 
 
-from source.utils import close_to, close_to_or_less_than
+from hypergeo.utils import close_to, close_to_or_less_than
 
 
 def binomln(m, k):

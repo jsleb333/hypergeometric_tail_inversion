@@ -1,8 +1,8 @@
 import numpy as np
 from scipy.special import binom, erfc
 
-from source.hypergeometric_distribution import hypergeometric_tail_inverse
-from source.binomial_distribution import binomial_tail_inverse
+from hypergeo.hypergeometric_distribution import hypergeometric_tail_inverse
+from hypergeo.binomial_distribution import binomial_tail_inverse
 
 
 def hypinv_upperbound(k,

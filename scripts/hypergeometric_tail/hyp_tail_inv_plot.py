@@ -4,7 +4,7 @@ import os, sys
 sys.path.append(os.getcwd())
 from itertools import chain
 
-from source import hypergeometric_tail_inverse
+from hypergeo import hypergeometric_tail_inverse
 
 
 def plot_hyp_tail_inv_k(m, deltas, M):

@@ -1,4 +1,4 @@
-from source.generalization_bounds import *
+from hypergeo.generalization_bounds import *
 
 
 def test_hypinv_upperbound():

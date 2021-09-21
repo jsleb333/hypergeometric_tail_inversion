@@ -6,9 +6,9 @@ os.chdir('./scripts/bounds_comparison/')
 import python2latex as p2l
 from graal_utils import Timer
 
-from source import optimize_mprime, optimize_catoni
-from source import hypinv_upperbound, vapnik_pessismistic_bound, vapnik_relative_deviation_bound, catoni_4_6
-from source.utils import sauer_shelah
+from hypergeo import optimize_mprime, optimize_catoni
+from hypergeo import hypinv_upperbound, vapnik_pessismistic_bound, vapnik_relative_deviation_bound, catoni_4_6
+from hypergeo.utils import sauer_shelah
 
 
 # Saved values of optimized m' for parameters (m, d, delta) using 'optimize_mprime(0, m, sauer_shelah(d), delta, max_mprime=13*m, min_mprime=3*m, early_stopping=1000)'

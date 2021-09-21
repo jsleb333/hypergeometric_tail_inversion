@@ -5,9 +5,9 @@ sys.path.append(os.getcwd())
 import python2latex as p2l
 from graal_utils import Timer
 
-from source import optimize_mprime
-from source import hypinv_upperbound, sample_compression_bound
-from source.utils import sauer_shelah
+from hypergeo import optimize_mprime
+from hypergeo import hypinv_upperbound, sample_compression_bound
+from hypergeo.utils import sauer_shelah
 
 
 m, d, delta = 2000, 50, 0.05

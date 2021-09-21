@@ -3,7 +3,7 @@ from python2latex import Document, Plot, holi
 import os, sys
 sys.path.append(os.getcwd())
 
-from source import hypergeometric_tail
+from hypergeo import hypergeometric_tail
 
 
 def plot_hyp_tail_k(m, Ks, M):

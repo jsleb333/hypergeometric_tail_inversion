@@ -2,7 +2,7 @@ import os, sys
 sys.path.append(os.getcwd())
 import numpy as np
 
-from source import *
+from hypergeo import *
 from graal_utils import Timer
 
 d = 10

@@ -1,6 +1,6 @@
 from scipy.special import binom, comb
 
-from source.hypergeometric_distribution import *
+from hypergeo.hypergeometric_distribution import *
 
 
 def test_hypergeometric_pmf():

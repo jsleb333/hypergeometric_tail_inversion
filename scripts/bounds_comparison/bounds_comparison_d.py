@@ -6,8 +6,8 @@ os.chdir('./scripts/bounds_comparison/')
 import python2latex as p2l
 from graal_utils import Timer
 
-from source import hypinv_upperbound, vapnik_pessismistic_bound, vapnik_relative_deviation_bound, catoni_4_6
-from source.utils import sauer_shelah
+from hypergeo import hypinv_upperbound, vapnik_pessismistic_bound, vapnik_relative_deviation_bound, catoni_4_6
+from hypergeo.utils import sauer_shelah
 
 
 def plot_comp_d(risk, m, delta=0.05):

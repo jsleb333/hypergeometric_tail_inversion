@@ -13,11 +13,11 @@ The code was written to run on Python 3.8 or more recent version.
 
 ## The code
 
-The code is split into 2 parts: the 'source' directory and the 'scripts' directory.
+The code is split into 2 parts: the 'hypergeo' directory and the 'scripts' directory.
 
-The source files implements the utilities regarding the hypergeometric distribution (to compute the tail and its inverse), the binomial distribution (reimplementing the inverse as the scipy version suffered from numerical unstabilities) and the generalization bounds used in the paper.
+The hypergeo files implements the utilities regarding the hypergeometric distribution (to compute the tail and its inverse), the binomial distribution (reimplementing the inverse as the scipy version suffered from numerical unstabilities) and the generalization bounds used in the paper.
 
-The scripts files uses the source files to produce the figures found in the paper.
+The scripts files uses the hypergeo files to produce the figures found in the paper.
 All figures are generated directly in LaTeX using the package `python2latex`.
 To run a script, navigate from the command line to the directory root directory of the project and run the command
 ```
@@ -41,8 +41,8 @@ Figure 1a and 1b are obtain by executing the scripts `bounds_comparison/bounds_c
 - Appendix B: Overview of the hypergeometric distribution.
 Figure 2 is generated from `hypergeometric_tail/hyp_tail_plot.py`.
 Figure 3 is generated from `hypergeometric_tail/hyp_tail_inv_plot.py`.
-Algorithm 1 is implemented in the source file `source/hypergeometric_distribution.py` as the function `hypergeometric_tail_inverse`.
-Algorithm 2 is implemented in the source file `source/hypergeometric_distribution.py` as the function `berkopec_hypergeometric_tail_inverse`.
+Algorithm 1 is implemented in the hypergeo file `hypergeo/hypergeometric_distribution.py` as the function `hypergeometric_tail_inverse`.
+Algorithm 2 is implemented in the hypergeo file `hypergeo/hypergeometric_distribution.py` as the function `berkopec_hypergeometric_tail_inverse`.
 
 - Appendix C: In-depth analysis of the ghost sample trade-off.
 Figure 4 is generated from `mprime_tradeoff/plot_epsilon_comp.py`.

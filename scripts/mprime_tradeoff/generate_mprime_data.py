@@ -7,7 +7,7 @@ from graal_utils import Timer
 import pandas as pd
 import xarray as xr
 
-from source import hypinv_upperbound
+from hypergeo import hypinv_upperbound
 
 
 def compute_bound_data(k, m, delta=0.05, d=10, max_mprime=300):

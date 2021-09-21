@@ -4,8 +4,8 @@ import os, sys
 sys.path.append(os.getcwd())
 from graal_utils import Timer
 
-from source import hypinv_reldev_upperbound
-from source.utils import sauer_shelah
+from hypergeo import hypinv_reldev_upperbound
+from hypergeo.utils import sauer_shelah
 
 
 if __name__ == "__main__":
