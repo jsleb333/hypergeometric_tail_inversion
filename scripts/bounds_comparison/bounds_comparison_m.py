@@ -6,13 +6,14 @@ os.chdir('./scripts/bounds_comparison/')
 import python2latex as p2l
 from graal_utils import Timer
 
-from hypergeo import hypinv_upperbound, vapnik_pessismistic_bound, vapnik_relative_deviation_bound, catoni_4_6
+from hypergeo import hypinv_upperbound, vapnik_pessismistic_bound, vapnik_relative_deviation_bound, catoni_4_6, lugosi_chaining
 from hypergeo.utils import sauer_shelah
 
 
 def plot_comp_m(risk, d, delta=0.05):
     ms = np.array(
-        list(range(d, 1000, 10))
+        list(range(d, 100, 2))
+        + list(range(100, 1000, 10))
         + list(range(1000, 10_000, 100))
         + [int(m) for m in np.logspace(13.5, 20, num=10, base=2)]
     )
@@ -26,7 +27,7 @@ def plot_comp_m(risk, d, delta=0.05):
                     lines='1pt',
                     xmode='log',
                     ymode='log',
-                    palette=reversed(p2l.holi(4))
+                    palette=reversed(p2l.holi(4)),
                     )
     plot.axis.kwoptions['legend style'] = r'{font=\scriptsize}'
     plot.axis.kwoptions['y label style'] = r'{yshift=-.2cm}'
@@ -39,6 +40,12 @@ def plot_comp_m(risk, d, delta=0.05):
     plot.x_label = "Sample size $m$"
     plot.y_label = 'Upper bound on $R_\mathcal{D}(h) - R_S(h)$'
     plot.legend_position = 'south west'
+
+    # Lugosi
+    with Timer('Lugosi'):
+        bound_values = np.array([lugosi_chaining(k, m, d, delta) for k, m in zip(ks, ms)])
+        print(ms[np.argmin((bound_values - .5)**2)])
+        plot.add_plot(ms, bound_values - risk, legend='Lugosi', color=p2l.holi(200)[-1])
 
     # VRD
     with Timer('VRD'):
@@ -81,7 +88,8 @@ def plot_comp_m(risk, d, delta=0.05):
     if risk > 0:
         plot.add_plot(ms, np.sqrt(d/ms), color='gray', line_width='.5pt', legend=r'\scalebox{.8}{\normalsize $\sqrt{d/m}$}')
     else:
-        plot.add_plot(ms, d/ms, color='gray', line_width='.5pt', legend='$d/m$')
+        ms = ms[1:]
+        plot.add_plot(ms, d/ms*np.log(ms/d), color='gray', line_width='.5pt', legend=r'$\frac{d}{m} \log\frac{m}{d}$')
 
     filename = f'bounds_comparison_m_{risk=}_{d=}'
     doc = p2l.Document(filename, doc_type='standalone')
@@ -95,9 +103,9 @@ def plot_comp_m(risk, d, delta=0.05):
 
 if __name__ == '__main__':
     risk, d, delta = 0.05, 50, 0.05
-    print(f'{risk=}, {d=}, {delta=}')
+    # print(f'{risk=}, {d=}, {delta=}')
 
-    # for risk in [0, 0.1, 0.2, 0.3]:
-    #     plot_comp_m(risk, d, delta)
+    for risk in [0, 0.1, 0.2, 0.3]:
+        plot_comp_m(risk, d, delta)
 
-    plot_comp_m(risk, 10, delta)
+    # plot_comp_m(risk, 10, delta)
