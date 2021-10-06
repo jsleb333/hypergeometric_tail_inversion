@@ -45,6 +45,17 @@ def test_hypergeometric_tail_inverse_log_delta_is_same_as_delta():
     assert hypergeometric_tail_inverse(k, m, delta, M) == hypergeometric_tail_inverse(k, m, np.log(delta), M, log_delta=True)
 
 
+def test_hypergeometric_tail_lower_inverse_is_inverse():
+    k, m, K, M = 5, 13, 16, 30
+    k, m, K, M = 20, 200, 42, 222
+    assert hypergeometric_tail_lower_inverse(k, m, hypergeometric_tail(k,m,K,M), M) == K
+    assert hypergeometric_tail_lower_inverse(k, m, hypergeometric_tail(k,m,K,M)-10e-18, M) == K
+    assert hypergeometric_tail_lower_inverse(k, m, hypergeometric_tail(k,m,K,M)+10e-18, M) == K-1
+
+    for delta in [0.05, 0.1, 0.25, 10e-20]:
+        assert hypergeometric_tail(k, m, hypergeometric_tail_lower_inverse(k,m,delta,M), M) >= delta
+
+
 def test_berkopec_hypergeometric_tail_inverse_below_is_inverse():
     k, m, K, M = 5, 13, 16, 30
     assert berkopec_hypergeometric_tail_inverse(k, m, hypergeometric_tail(k,m,K,M), M) == K
