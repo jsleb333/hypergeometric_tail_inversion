@@ -13,6 +13,11 @@ def test_hypergeometric_tail():
     assert np.isclose(hypergeometric_tail(k, m, K, M), sum(binom(K, j)*binom(M-K, m-j)/binom(M, m) for j in range(k+1)))
 
 
+def test_hypergeometric_lower_tail():
+    k, m, K, M = 5, 13, 16, 30
+    assert np.isclose(hypergeometric_tail(k, m, K, M), 1-hypergeometric_lower_tail(k, m, K, M))
+
+
 def test_berkopec_single_term():
     k, m, K, M = 5, 13, 16, 30
     assert berkopec_single_term(k,m,K,M) == binom(K, k)*binom(M-K-1, M-K-m+k)/binom(M, m)
@@ -47,13 +52,16 @@ def test_hypergeometric_tail_inverse_log_delta_is_same_as_delta():
 
 def test_hypergeometric_tail_lower_inverse_is_inverse():
     k, m, K, M = 5, 13, 16, 30
-    k, m, K, M = 20, 200, 42, 222
-    assert hypergeometric_tail_lower_inverse(k, m, hypergeometric_tail(k,m,K,M), M) == K
-    assert hypergeometric_tail_lower_inverse(k, m, hypergeometric_tail(k,m,K,M)-10e-18, M) == K
-    assert hypergeometric_tail_lower_inverse(k, m, hypergeometric_tail(k,m,K,M)+10e-18, M) == K-1
+    k, m, K, M = 20, 150, 52, 222
+    assert hypergeometric_tail_lower_inverse(k, m, 1-hypergeometric_tail(k,m,K,M), M) == K
+    assert hypergeometric_tail_lower_inverse(k, m, 1-hypergeometric_tail(k,m,K+1,M), M) == K+1
+    assert hypergeometric_tail_lower_inverse(k, m, 1-hypergeometric_tail(k,m,K-1,M), M) == K-1
+    mean = (hypergeometric_tail(k,m,K,M) + hypergeometric_tail(k,m,K-1,M))/2
+    assert hypergeometric_tail_lower_inverse(k, m, 1-mean, M) == K-1
+    assert hypergeometric_tail_lower_inverse(k, m, 1-hypergeometric_tail(k,m,K,M)+10e-18, M) == K
 
-    for delta in [0.05, 0.1, 0.25, 10e-20]:
-        assert hypergeometric_tail(k, m, hypergeometric_tail_lower_inverse(k,m,delta,M), M) >= delta
+    for delta in [0.05, 0.1, 0.25, 1-10e-20]:
+        assert hypergeometric_tail(k, m, hypergeometric_tail_lower_inverse(k,m,1-delta,M), M) >= delta
 
 
 def test_berkopec_hypergeometric_tail_inverse_below_is_inverse():

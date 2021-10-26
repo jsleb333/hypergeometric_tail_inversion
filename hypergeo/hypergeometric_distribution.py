@@ -53,6 +53,11 @@ def hypergeometric_tail(k, m, K, M):
     return hypergeom.cdf(k, M, K, m)
     # return sum(hypergeom.pmf(j, M, K, m) for j in range(max(0, m-M+K), k+1))
 
+
+def hypergeometric_lower_tail(k, m, K, M):
+    return hypergeom.sf(k, M, K, m)
+
+
 def berkopec_single_term(k, m, K, M):
     """
     Computes a single term of Berkopec's formula for the hypergeometric cumulative distribution function. Berkopec's formula is:
@@ -111,7 +116,7 @@ def hypergeometric_berkopec_tail(k, m, K, M):
 def hypergeometric_tail_inverse(k, m, delta, M, log_delta=False):
     """
     Computes the pseudo-inverse of the hypergeometric distribution tail:
-        HypInv(k, m, delta, M) = min{ K : Hyp(j, m, K, M) <= delta },
+        HypInv(k, m, delta, M) = min{ K : Hyp(k, m, K, M) <= delta },
     where Hyp(k, m, K, M) is the cumulative distribution function (CDF).
 
     Args:
@@ -150,44 +155,36 @@ def hypergeometric_tail_inverse(k, m, delta, M, log_delta=False):
     return K_max
 
 
-def hypergeometric_tail_lower_inverse(k, m, delta, M, log_delta=False):
+def hypergeometric_tail_lower_inverse(k, m, one_minus_delta, M):
     """
     Computes the lower pseudo-inverse of the hypergeometric distribution tail:
-        HypInv(k, m, delta, M) = max{ K : Hyp(j, m, K, M) >= delta },
+        HypLowerInv(k, m, delta, M) = max{ K : Hyp(k, m, K, M) >= delta },
     where Hyp(k, m, K, M) is the cumulative distribution function (CDF).
+    To avoid numerical instabilities, we instead compute the equivalent expression:
+        max{ K : 1 - Hyp(k, m, K, M) <= 1 - delta },
+    which is why the function takes into argument one_minus_delta instead of delta.
 
     Args:
         k (int): Number of errors observed.
         m (int): Sample size.
-        delta (float): Confidence parameter threshold.
+        one_minus_delta (float): One minus the confidence parameter threshold.
         M (int): Population size.
-        log_delta (bool): Whether or not parameter 'delta' is the logarithm of delta to avoid overflow.
 
-    Implements a bisection algorithm to find the pseudo-inverse in O(k log(M-m)), as opposed to the other algorithms which are in Θ(M-m). The bisection is adjusted to deal with the discrete nature of the hypergeometric tail.
+    Implements a bisection algorithm to find the pseudo-inverse in O(k log(M-m)). The bisection is adjusted to deal with the discrete nature of the hypergeometric tail.
 
     Returns K the number of errors in the whole population with probability 1 - delta.
     """
     K_min = k
     K_max = M - m + k + 1
-    K_mid = (K_max + K_min + 1)//2
-    hyp_cdf = hypergeometric_tail(k, m, K_mid, M)
-    if log_delta:
-        if np.isclose(hyp_cdf, 0):
-            hyp_cdf = -np.inf
-        else:
-            hyp_cdf = np.log(hyp_cdf)
     while K_max - K_min > 1:
-        if hyp_cdf < delta and not close_to(hyp_cdf, delta, atol=0, rtol=10e-16):
+        K_mid = (K_max + K_min + 1)//2
+        hyp_sf = hypergeometric_lower_tail(k, m, K_mid, M)
+        if close_to(hyp_sf, one_minus_delta, atol=0, rtol=10e-12):
+            return K_mid
+        if hyp_sf > one_minus_delta:
             K_max = K_mid
         else:
             K_min = K_mid
-        K_mid = (K_max + K_min + 1)//2
-        hyp_cdf = hypergeometric_tail(k, m, K_mid, M)
-        if log_delta:
-            if hyp_cdf == 0:
-                hyp_cdf == -np.inf
-            else:
-                hyp_cdf = np.log(hyp_cdf)
 
     return K_min
 
