@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.special import binom, erfc
 
-from hypergeo.hypergeometric_distribution import hypergeometric_tail_inverse
+from hypergeo.hypergeometric_distribution import hypergeometric_tail_inverse, hypergeometric_tail_lower_inverse
 from hypergeo.binomial_distribution import binomial_tail_inverse
 
 
@@ -13,7 +13,7 @@ def hypinv_upperbound(k,
                       max_mprime=None,
                       log_delta=False):
     """
-    Implements the bound of Theorem 8.
+    Implements the bound of Theorem 5.
 
     Args:
         k (int): Number of errors of the classifier on the sample.
@@ -44,6 +44,50 @@ def hypinv_upperbound(k,
         delta = delta/4/growth_function(m+mprime)
 
     return max(1, hypergeometric_tail_inverse(k, m, delta, m+mprime, log_delta)-1-k)/mprime
+
+
+def hypinv_lowerbound(k,
+                      m,
+                      growth_function,
+                      delta=0.05,
+                      mprime=None,
+                      max_mprime=None,
+                      **kwargs):
+    """
+    Implements the bound of Theorem 7.
+
+    Args:
+        k (int): Number of errors of the classifier on the sample.
+        m (int): Number of examples of the sample.
+        growth_function (callable):
+            Growth function of the hypothesis class. Will receive m+mprime as input and should output a number.
+        delta (float): Confidence parameter.
+        mprime (int or None):
+            Ghost sample size. If None, will be optimized for the given inputs. This requires calling growth_function 'max_mprime' times. If too slow, one can use the heuristic value of 4*m as a good guess.
+        max_mprime (int):
+            Used when optimizing mprime. Will evaluate the best value of mprime within 1 and 'max_mprime'. If None, defaults to 15*m.
+
+    Returns epsilon, the upper bound between 0 and 1.
+    """
+    if k == 0:
+        return 0
+
+    if mprime is None:
+        if max_mprime is None:
+            max_mprime = 15*m
+        mprime = optimize_mprime(
+            k=k,
+            m=m,
+            growth_function=growth_function,
+            delta=delta,
+            max_mprime=max_mprime,
+            bound=hypinv_lowerbound,
+            optimization_mode='max',
+        )
+
+    one_minus_delta = delta/4/growth_function(m+mprime)
+
+    return min(mprime-1, hypergeometric_tail_lower_inverse(k-1, m, one_minus_delta, m+mprime)+1-k)/mprime
 
 
 def hypinv_reldev_upperbound(k,
@@ -101,6 +145,7 @@ def optimize_mprime(k,
                     max_mprime=10_000,
                     min_mprime=1,
                     bound=hypinv_upperbound,
+                    optimization_mode='min',
                     early_stopping=np.inf,
                     return_bound=False,
                     log_delta=False):
@@ -108,10 +153,11 @@ def optimize_mprime(k,
     bounds = np.ones(max_mprime - min_mprime + 1)
     best_bound = 1
     best_mprime = min_mprime
+    sign = 1 if optimization_mode == 'min' else -1
     for i, mprime in enumerate(range(min_mprime, max_mprime+1)):
         bound_value = bound(k, m, growth_function, delta, mprime, log_delta=log_delta)
         bounds[i] = bound_value
-        if bound_value <= best_bound:
+        if sign*bound_value <= sign*best_bound:
             best_bound = bound_value
             best_mprime = mprime
             steps_since_last_best = 0
