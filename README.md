@@ -11,6 +11,8 @@ To do so, run the following command from the root directory:
 pip install .
 ```
 
+Doing so will also provide you with the package `hypergeo`, which implements an algorithm to compute the hypergeometric tail pseudo-inverses.
+
 ## Requirements
 
 The code was written to run on Python 3.8 or more recent version.
