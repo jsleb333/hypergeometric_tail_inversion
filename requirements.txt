@@ -1,6 +1,6 @@
 numpy
 scipy
-python2latex==0.4.0
+python2latex==0.4.1
 colorama
 git+https://github.com/GRAAL-Research/graal-utils
 pandas
