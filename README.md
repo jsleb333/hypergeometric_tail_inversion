@@ -1,4 +1,4 @@
-# Improving generalization bounds for VC classes using the hypergeometric tail inversion
+# Improving Generalization Bounds for VC Classes Using the Hypergeometric Tail Inversion
 
 ## Preface
 This directory provides an implementation of the algorithms used to compute the hypergeometric tail pseudo-inverse, as well as the code used to produce all figures of the paper "Improving Generalization Bounds for VC Classes Using the Hypergeometric Tail Inversion" by Leboeuf, LeBlanc and Marchand.
