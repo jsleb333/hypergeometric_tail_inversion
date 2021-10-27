@@ -1,13 +1,12 @@
 import numpy as np
-import os, sys
-sys.path.append(os.getcwd())
 
 import python2latex as p2l
 from graal_utils import Timer
 
-from hypergeo import optimize_mprime
 from hypergeo import hypinv_upperbound, sample_compression_bound
 from hypergeo.utils import sauer_shelah
+
+from scripts.utils import main_path as path
 
 
 m, d, delta = 2000, 50, 0.05
@@ -19,11 +18,10 @@ m, d, delta = 2000, 50, 0.05
 # mp = 3611 # Optimization returns this number when run with m=1000, d=20 and delta=0.05
 # mp = 5937 # Optimization returns this number when run with m=1500, d=15 and delta=0.05
 mp = 6970 # Optimization returns this number when run with m=2000, d=50 and delta=0.05
-# mp = m
 
 
 plot = p2l.Plot(plot_name=f'sc_comparison_risk_{m=}_{d=}_{delta=}',
-                plot_path='figures',
+                plot_path=path+'/figures',
                 as_float_env=False,
                 width='7.45cm',
                 height='6cm',
@@ -69,14 +67,9 @@ plot.x_label = "Empirical risk $R_S(h)$"
 plot.y_label = 'Upper bound on the true risk'
 plot.legend_position = 'south east'
 
-
-os.chdir('./scripts/bounds_comparison/')
-
-filename = 'sc_comparison_risk'
-
-doc = p2l.Document(filename, doc_type='standalone')
-doc.add_package('times')
+doc = p2l.Document('sc_comparison_risk', filepath=path, doc_type='standalone')
+doc.add_package('mathalfa', cal='dutchcal', scr='boondox')
 doc += plot
 
 print('Building...')
-doc.build(delete_files='all')
+doc.build(delete_files='all', show_pdf=False)

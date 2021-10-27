@@ -79,7 +79,7 @@ def plot_comp_d(risk, m, delta=0.05):
     doc.add_package('mathalfa', cal='dutchcal', scr='boondox')
     doc += plot
     print('Building...')
-    doc.build(delete_files='all', show_pdf=True)
+    doc.build(delete_files='all', show_pdf=False)
     print('Building completed.')
 
 
