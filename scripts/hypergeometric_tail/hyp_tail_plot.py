@@ -1,9 +1,10 @@
 import numpy as np
 from python2latex import Document, Plot, holi
-import os, sys
-sys.path.append(os.getcwd())
 
 from hypergeo import hypergeometric_tail
+
+import os
+path = os.path.dirname(__file__)
 
 
 def plot_hyp_tail_k(m, Ks, M):
@@ -115,9 +116,6 @@ def plot_hyp_tail_M(k, m, Ks):
 
 
 if __name__ == "__main__":
-    import os
-    os.chdir('./scripts/hypergeometric_tail/')
-
     m = 20
     M = 40
     k = 3
@@ -135,9 +133,9 @@ if __name__ == "__main__":
     # filename = 'hyp_tail_plot_capital_M'
     # plot = plot_hyp_tail_M(k, m, [6, 9, 12, 15, 18])
 
-    doc = Document(filename, doc_type='standalone')
+    doc = Document(filename, filepath=path, doc_type='standalone')
     doc += plot
 
     print('Building...')
-    doc.build(delete_files='all')
+    doc.build(delete_files='all', show_pdf=False)
 
