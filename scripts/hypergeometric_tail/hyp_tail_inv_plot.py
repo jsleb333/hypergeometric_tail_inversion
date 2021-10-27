@@ -10,6 +10,7 @@ path = os.path.dirname(__file__)
 
 def plot_hyp_tail_inv_k(m, deltas, M):
     plot = Plot(plot_name='plot_hyp_tail_inv_k',
+                plot_path=path+'/figures',
                 width='7.45cm',
                 height='7.45cm',
                 lines='.9pt',
@@ -42,6 +43,7 @@ def plot_hyp_tail_inv_k(m, deltas, M):
 
 def plot_hyp_tail_inv_m(k, delta, Ms):
     plot = Plot(plot_name='plot_hyp_tail_inv_m',
+                plot_path=path+'/figures',
                 width='7.45cm',
                 height='7.45cm',
                 lines='.9pt',
@@ -69,6 +71,7 @@ def plot_hyp_tail_inv_m(k, delta, Ms):
 
 def plot_hyp_tail_inv_delta(ks, m, M):
     plot = Plot(plot_name='plot_hyp_tail_delta',
+                plot_path=path+'/figures',
                 width='7.45cm',
                 height='7.45cm',
                 lines='.9pt',
@@ -115,6 +118,7 @@ def plot_hyp_tail_inv_delta(ks, m, M):
 
 def plot_hyp_tail_inv_M(k, m, deltas):
     plot = Plot(plot_name='plot_hyp_tail_inv_M',
+                plot_path=path+'/figures',
                 width='7.45cm',
                 height='7.45cm',
                 lines='.9pt',

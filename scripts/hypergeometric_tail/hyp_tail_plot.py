@@ -9,6 +9,7 @@ path = os.path.dirname(__file__)
 
 def plot_hyp_tail_k(m, Ks, M):
     plot = Plot(plot_name='plot_hyp_tail_k',
+                plot_path=path+'/figures',
                 width='7.45cm',
                 height='7.45cm',
                 lines='.9pt',
@@ -36,6 +37,7 @@ def plot_hyp_tail_k(m, Ks, M):
 
 def plot_hyp_tail_m(k, K, Ms):
     plot = Plot(plot_name='plot_hyp_tail_m',
+                plot_path=path+'/figures',
                 width='7.45cm',
                 height='7.45cm',
                 lines='.9pt',
@@ -63,6 +65,7 @@ def plot_hyp_tail_m(k, K, Ms):
 
 def plot_hyp_tail_K(ks, m, M):
     plot = Plot(plot_name='plot_hyp_tail_K',
+                plot_path=path+'/figures',
                 width='7.45cm',
                 height='7.45cm',
                 lines='.9pt',
@@ -90,6 +93,7 @@ def plot_hyp_tail_K(ks, m, M):
 
 def plot_hyp_tail_M(k, m, Ks):
     plot = Plot(plot_name='plot_hyp_tail_M',
+                plot_path=path+'/figures',
                 width='7.45cm',
                 height='7.45cm',
                 lines='.9pt',
