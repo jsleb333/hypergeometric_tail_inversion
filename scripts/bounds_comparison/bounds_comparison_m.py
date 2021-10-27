@@ -6,7 +6,9 @@ from graal_utils import Timer
 from hypergeo import hypinv_upperbound, vapnik_pessismistic_bound, vapnik_relative_deviation_bound, catoni_4_6, lugosi_chaining
 from hypergeo.utils import sauer_shelah
 
-from scripts.utils import main_path as path
+import os
+path = os.path.dirname(__file__)
+
 
 def plot_comp_m(risk, d, delta=0.05):
     ms = np.array(

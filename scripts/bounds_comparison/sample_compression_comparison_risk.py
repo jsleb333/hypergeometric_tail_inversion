@@ -6,7 +6,8 @@ from graal_utils import Timer
 from hypergeo import hypinv_upperbound, sample_compression_bound
 from hypergeo.utils import sauer_shelah
 
-from scripts.utils import main_path as path
+import os
+path = os.path.dirname(__file__)
 
 
 m, d, delta = 2000, 50, 0.05

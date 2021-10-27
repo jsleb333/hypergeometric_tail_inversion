@@ -7,7 +7,9 @@ from hypergeo import optimize_mprime, optimize_catoni
 from hypergeo import hypinv_upperbound, vapnik_pessismistic_bound, vapnik_relative_deviation_bound, catoni_4_6
 from hypergeo.utils import sauer_shelah
 
-from scripts.utils import main_path as path
+import os
+path = os.path.dirname(__file__)
+
 
 # Saved values of optimized m' for parameters (m, d, delta) using 'optimize_mprime(0, m, sauer_shelah(d), delta, max_mprime=13*m, min_mprime=3*m, early_stopping=1000)'
 mp_dict = {
