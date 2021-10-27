@@ -1,7 +1,4 @@
 import numpy as np
-import os, sys
-sys.path.append(os.getcwd())
-os.chdir('./scripts/bounds_comparison/')
 
 import python2latex as p2l
 from graal_utils import Timer
@@ -10,11 +7,13 @@ from hypergeo import optimize_mprime, optimize_catoni
 from hypergeo import hypinv_upperbound, vapnik_pessismistic_bound, vapnik_relative_deviation_bound, catoni_4_6
 from hypergeo.utils import sauer_shelah
 
+from scripts.utils import main_path as path
 
 # Saved values of optimized m' for parameters (m, d, delta) using 'optimize_mprime(0, m, sauer_shelah(d), delta, max_mprime=13*m, min_mprime=3*m, early_stopping=1000)'
 mp_dict = {
     (100, 50, 0.05): 388,
     (200, 15, 0.05): 678,
+    (400, 10, 0.05): 1463,
     (500, 20, 0.05): 1673,
     (500, 50, 0.05): 1578,
     (1000, 10, 0.05): 4071,
@@ -27,7 +26,7 @@ mp_dict = {
 
 def plot_risk_comp(m, d, delta=0.05, show_non_opti=False):
     catoni_mp = optimize_catoni(0, m, d, delta)[1]
-    print(catoni_mp/m)
+    print('Optimal m_prime for C4.6:', catoni_mp/m)
 
     if (m, d, delta) in mp_dict:
         mp = mp_dict[(m, d, delta)]
@@ -36,7 +35,7 @@ def plot_risk_comp(m, d, delta=0.05, show_non_opti=False):
         print(f'Optimal mprime for params ({m=}, {d=}, {delta=}): {mp=}')
 
     plot = p2l.Plot(plot_name=f'bounds_comp_{m=}_{d=}_{delta=}',
-                    plot_path='figures',
+                    plot_path=path+'/figures',
                     as_float_env=False,
                     width='7.45cm',
                     height='6cm',
@@ -108,8 +107,7 @@ def plot_risk_comp(m, d, delta=0.05, show_non_opti=False):
     if show_non_opti:
         filename += '_with_non_opti'
 
-    doc = p2l.Document(filename, doc_type='standalone')
-    doc.add_package('times')
+    doc = p2l.Document(filename, filepath=path, doc_type='standalone')
     doc.add_package('mathalfa', cal='dutchcal', scr='boondox')
     doc += plot
 
@@ -124,4 +122,4 @@ if __name__ == '__main__':
     #     with Timer(f'{m=}'):
     #         plot_risk_comp(m, d, delta)
 
-    plot_risk_comp(2000, d, delta, show_non_opti=True)
+    plot_risk_comp(400, d, delta, show_non_opti=True)
