@@ -1,13 +1,12 @@
 import numpy as np
-import os, sys
-sys.path.append(os.getcwd())
-os.chdir('./scripts/bounds_comparison/')
 
 import python2latex as p2l
 from graal_utils import Timer
 
 from hypergeo import hypinv_upperbound, vapnik_pessismistic_bound, vapnik_relative_deviation_bound, catoni_4_6
 from hypergeo.utils import sauer_shelah
+
+from scripts.utils import main_path as path
 
 
 def plot_comp_d(risk, m, delta=0.05):
@@ -18,7 +17,7 @@ def plot_comp_d(risk, m, delta=0.05):
     k = int(risk*m)
 
     plot = p2l.Plot(plot_name=f'bounds_comp_d_{risk=}_{m=}_{delta=}',
-                    plot_path='figures',
+                    plot_path=path+'/figures',
                     as_float_env=False,
                     width='7.45cm',
                     height='6cm',
@@ -76,9 +75,8 @@ def plot_comp_d(risk, m, delta=0.05):
         plot.add_plot(ds, bound_values, legend='HTI')
 
     filename = f'bounds_comparison_d_{risk=}_{m=}'
-    doc = p2l.Document(filename, doc_type='standalone')
+    doc = p2l.Document(filename, filepath=path, doc_type='standalone')
     doc.add_package('mathalfa', cal='dutchcal', scr='boondox')
-    doc.add_package('times')
     doc += plot
     print('Building...')
     doc.build(delete_files='all', show_pdf=True)
