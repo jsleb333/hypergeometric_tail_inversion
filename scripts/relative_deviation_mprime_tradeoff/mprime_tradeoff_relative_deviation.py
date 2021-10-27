@@ -1,11 +1,12 @@
 import numpy as np
 import csv
-import os, sys
-sys.path.append(os.getcwd())
 from graal_utils import Timer
 
 from hypergeo import hypinv_reldev_upperbound
 from hypergeo.utils import sauer_shelah
+
+import os
+path = os.path.dirname(__file__) + '/data/'
 
 
 if __name__ == "__main__":
@@ -23,7 +24,6 @@ if __name__ == "__main__":
              [(k,m,x,delta) for x in ds] +\
              [(k,m,d,x) for x in deltas]
 
-    path = './scripts/mprime_tradeoff_relative_deviation/data/'
     os.makedirs(path, exist_ok=True)
 
     # Generates all the data and saves it
