@@ -6,7 +6,9 @@ from graal_utils import Timer
 from hypergeo import optimize_mprime, hypinv_upperbound, hypinv_lowerbound
 from hypergeo.utils import sauer_shelah
 
-from scripts.utils import main_path as path
+import os
+path = os.path.dirname(__file__)
+
 
 # Saved values of optimized m' for parameters (m, d, delta) using 'optimize_mprime(0, m, sauer_shelah(d), delta, max_mprime=13*m, min_mprime=3*m, early_stopping=1000)'
 mp_dict = {
