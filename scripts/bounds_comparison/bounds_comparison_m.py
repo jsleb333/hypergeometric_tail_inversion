@@ -1,7 +1,4 @@
 import numpy as np
-import os, sys
-sys.path.append(os.getcwd())
-os.chdir('./scripts/bounds_comparison/')
 
 import python2latex as p2l
 from graal_utils import Timer
@@ -9,18 +6,19 @@ from graal_utils import Timer
 from hypergeo import hypinv_upperbound, vapnik_pessismistic_bound, vapnik_relative_deviation_bound, catoni_4_6, lugosi_chaining
 from hypergeo.utils import sauer_shelah
 
+from scripts.utils import main_path as path
 
 def plot_comp_m(risk, d, delta=0.05):
     ms = np.array(
         list(range(d, 100, 2))
-        + list(range(100, 1000, 10))
-        + list(range(1000, 10_000, 100))
-        + [int(m) for m in np.logspace(13.5, 20, num=10, base=2)]
+        + list(range(100, 1300, 10))
+        + list(range(1300, 10_000, 100))
+        + [m for m in np.logspace(13.5, 20, num=10, base=2)]
     )
     ks = np.array([int(risk*m) for m in ms])
 
     plot = p2l.Plot(plot_name=f'bounds_comp_m_{risk=}_{d=}_{delta=}',
-                    plot_path='figures',
+                    plot_path=path+'/figures',
                     as_float_env=False,
                     width='7.45cm',
                     height='6cm',
@@ -61,7 +59,7 @@ def plot_comp_m(risk, d, delta=0.05):
 
     # Catoni
     with Timer('C4.6'):
-        bound_values = np.array([catoni_4_6(k, m, d, delta, mprime=None) for k, m in zip(ks, ms)])
+        bound_values = np.array([catoni_4_6(k, float(m), d, delta, mprime=None, max_mprime=100*float(m)) for k, m in zip(ks, ms)])
         print(ms[np.argmin((bound_values - .5)**2)])
         plot.add_plot(ms, bound_values - risk, legend='C4.6')
 
@@ -70,9 +68,9 @@ def plot_comp_m(risk, d, delta=0.05):
         def mprime(k, m):
             best_mp = int(3.25*m)
             best_bound = 1
-            for ratio in np.arange(3.25, 13, step=.25):
-                mp = int(m*ratio)
-                bound = hypinv_upperbound(k, m, sauer_shelah(d), delta, mp)
+            for ratio in np.arange(3, 20, step=1):
+                mp = float(m)*ratio
+                bound = hypinv_upperbound(k, float(m), sauer_shelah(d), delta, mp)
                 if bound < best_bound:
                     best_bound = bound
                     best_mp = mp
@@ -80,7 +78,7 @@ def plot_comp_m(risk, d, delta=0.05):
                     break
             return best_mp
 
-        bound_values = np.array([hypinv_upperbound(k, m, sauer_shelah(d), delta, mprime=mprime(k, m)) for k, m in zip(ks, ms)])
+        bound_values = np.array([hypinv_upperbound(k, float(m), sauer_shelah(d), delta, mprime=mprime(k, m)) for k, m in zip(ks, ms)])
         print(ms[np.argmin((bound_values - .5)**2)])
         plot.add_plot(ms, bound_values - risk, legend='HTI')
 
@@ -92,9 +90,8 @@ def plot_comp_m(risk, d, delta=0.05):
         plot.add_plot(ms, d/ms*np.log(ms/d), color='gray', line_width='.5pt', legend=r'$\frac{d}{m} \log\frac{m}{d}$')
 
     filename = f'bounds_comparison_m_{risk=}_{d=}'
-    doc = p2l.Document(filename, doc_type='standalone')
+    doc = p2l.Document(filename, filepath=path, doc_type='standalone')
     doc.add_package('mathalfa', cal='dutchcal', scr='boondox')
-    doc.add_package('times')
     doc += plot
     print('Building...')
     doc.build(delete_files='all', show_pdf=False)
@@ -102,10 +99,10 @@ def plot_comp_m(risk, d, delta=0.05):
 
 
 if __name__ == '__main__':
-    risk, d, delta = 0.05, 50, 0.05
+    risk, d, delta = 0, 50, 0.05
+    plot_comp_m(risk, d, delta)
     # print(f'{risk=}, {d=}, {delta=}')
 
-    for risk in [0, 0.1, 0.2, 0.3]:
-        plot_comp_m(risk, d, delta)
+    # for risk in [0, 0.1, 0.2, 0.3]:
+    #     plot_comp_m(risk, d, delta)
 
-    # plot_comp_m(risk, 10, delta)
