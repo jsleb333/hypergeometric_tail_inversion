@@ -1,14 +1,16 @@
 import numpy as np
 import pandas as pd
-import os
 
 import python2latex as p2l
+
+import os
+path = os.path.dirname(__file__)
 
 
 def plot_comp_k(m, ks, d, delta=0.05):
 
     plot = p2l.Plot(plot_name=f'tradeoff_comp_k_{m=}_{d=}_{delta=}',
-                    plot_path='figures',
+                    plot_path=path+'/figures',
                     as_float_env=False,
                     width='7.45cm',
                     height='5.45cm',
@@ -21,7 +23,7 @@ def plot_comp_k(m, ks, d, delta=0.05):
     plot.add_plot([m,m], [0,1], color=palette[0], line_width='1pt', opacity='.5', label="\\footnotesize $m'=m$", label_anchor='south')
 
     for k, color in zip(ks, palette[1:]):
-        datafile = f'./data/mprime_tradeoff-{m=}_{k=}_{d=}_{delta=}.csv'
+        datafile = path + f'/data/mprime_tradeoff-{m=}_{k=}_{d=}_{delta=}.csv'
         df = pd.read_csv(datafile, sep=',', header=0)
         idx = list(range(0, 2000, 1)) + list(range(2000, 10_000, 500)) + [9_999]
         mprimes = [df['mprime'][i] for i in idx]
@@ -40,7 +42,7 @@ def plot_comp_k(m, ks, d, delta=0.05):
 def plot_comp_d(m, k, ds, delta=0.05):
 
     plot = p2l.Plot(plot_name=f'tradeoff_comp_d_{m=}_{k=}_{delta=}',
-                    plot_path='figures',
+                    plot_path=path+'/figures',
                     as_float_env=False,
                     width='7.45cm',
                     height='5.45cm',
@@ -53,7 +55,7 @@ def plot_comp_d(m, k, ds, delta=0.05):
     plot.add_plot([m,m], [0,1], palette[0], line_width='1pt', opacity='.5', label="\\footnotesize $m'=m$", label_anchor='south')
 
     for d, color in zip(ds, palette[1:]):
-        datafile = f'./data/mprime_tradeoff-{m=}_{k=}_{d=}_{delta=}.csv'
+        datafile = path + f'/data/mprime_tradeoff-{m=}_{k=}_{d=}_{delta=}.csv'
         df = pd.read_csv(datafile, sep=',', header=0)
         idx = list(range(0, 2000)) + list(range(2000, 10_000, 500)) + [9_999]
         mprimes = [df['mprime'][i] for i in idx]
@@ -73,7 +75,7 @@ def plot_comp_d(m, k, ds, delta=0.05):
 def plot_comp_delta(m, k, d, deltas):
 
     plot = p2l.Plot(plot_name=f'tradeoff_comp_delta_{m=}_{k=}_{d=}',
-                    plot_path='figures',
+                    plot_path=path+'/figures',
                     as_float_env=False,
                     width='7.45cm',
                     height='5.45cm',
@@ -88,7 +90,7 @@ def plot_comp_delta(m, k, d, deltas):
     # First line plot
     delta = deltas[0]
     color = palette[2]
-    datafile = f'./data/mprime_tradeoff-{m=}_{k=}_{d=}_{delta=}.csv'
+    datafile = path + f'/data/mprime_tradeoff-{m=}_{k=}_{d=}_{delta=}.csv'
     df = pd.read_csv(datafile, sep=',', header=0)
     idx = list(range(0, 2000)) + list(range(2000, 10_000, 500)) + [9_999]
     mprimes = [df['mprime'][i] for i in idx]
@@ -105,7 +107,7 @@ def plot_comp_delta(m, k, d, deltas):
     # Second line plot
     delta = deltas[1]
     color = palette[4]
-    datafile = f'./data/mprime_tradeoff-{m=}_{k=}_{d=}_{delta=}.csv'
+    datafile = path + f'/data/mprime_tradeoff-{m=}_{k=}_{d=}_{delta=}.csv'
     df = pd.read_csv(datafile, sep=',', header=0)
     idx = list(range(0, 2000)) + list(range(2000, 10_000, 500)) + [9_999]
     mprimes = [df['mprime'][i] for i in idx]
@@ -123,7 +125,7 @@ def plot_comp_delta(m, k, d, deltas):
 def plot_comp_m(ms, k, d, delta):
 
     plot = p2l.Plot(plot_name=f'tradeoff_comp_m_{k=}_{d=}_{delta=}',
-                    plot_path='figures',
+                    plot_path=path+'/figures',
                     as_float_env=False,
                     width='7.45cm',
                     height='5.45cm',
@@ -138,7 +140,7 @@ def plot_comp_m(ms, k, d, delta):
         plot.add_plot([m,m], [0,1], color=color, line_width='1pt', opacity='.5', label=f"\\footnotesize ${m}$", label_anchor='south')
 
     for m, color in zip(ms, palette[::2]):
-        datafile = f'./data/mprime_tradeoff-{m=}_{k=}_{d=}_{delta=}.csv'
+        datafile = path + f'/data/mprime_tradeoff-{m=}_{k=}_{d=}_{delta=}.csv'
         df = pd.read_csv(datafile, sep=',', header=0)
         idx = list(range(0, 2000)) + list(range(2000, 10_000, 500)) + [9_999]
         mprimes = df['mprime']
@@ -156,8 +158,6 @@ def plot_comp_m(ms, k, d, delta):
     return plot
 
 if __name__ == "__main__":
-    os.chdir('./scripts/mprime_tradeoff/')
-
     ms = [100, 300, 1000]
     # ms = [100, 200, 300, 500, 1000]
     deltas = [0.0001, 0.1]
@@ -176,7 +176,7 @@ if __name__ == "__main__":
     filename = f'mprime_tradeoff_comp_m'
     plot = plot_comp_m(ms, 0, 10, 0.05)
 
-    doc = p2l.Document(filename, doc_type='standalone')
+    doc = p2l.Document(filename, filepath=path, doc_type='standalone')
 
     plot.x_min = 5
     plot.x_max = 65_000
@@ -189,4 +189,4 @@ if __name__ == "__main__":
     doc += plot
 
     print('Building...')
-    doc.build(delete_files='all')
+    doc.build(delete_files='all', show_pdf=False)

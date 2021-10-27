@@ -1,15 +1,17 @@
 import numpy as np
 import xarray as xr
-import os
 
 import python2latex as p2l
+
+import os
+path = os.path.dirname(__file__)
 
 
 def plot_mprime_best(ms, risks, d, delta):
     ms, risks = np.array(ms), np.array(risks)
 
     plot = p2l.Plot(plot_name=f'mprime_best{d=}',
-                    plot_path='figures',
+                    plot_path=path+'/figures',
                     as_float_env=False,
                     width='7.45cm',
                     height='5.45cm',
@@ -17,7 +19,7 @@ def plot_mprime_best(ms, risks, d, delta):
                     lines=False,
                     palette='holi5')
 
-    best_mprimes = xr.open_dataset('data/optimal_bound.nc')['mprime'].drop_sel(d=50)
+    best_mprimes = xr.open_dataset(path+'/data/optimal_bound.nc')['mprime'].drop_sel(d=50)
 
     for m in ms:
         plot_mprimes = best_mprimes.sel(m=m, d=d, delta=delta)
@@ -36,8 +38,6 @@ def plot_mprime_best(ms, risks, d, delta):
 
 
 if __name__ == "__main__":
-    os.chdir('./scripts/mprime_tradeoff/')
-
     d = 10
     # d = 35
     ms = [100, 200, 300, 500, 1000]
@@ -45,9 +45,9 @@ if __name__ == "__main__":
     delta = 0.05
 
     filename = f'mprime_best_{d=}'
-    doc = p2l.Document(filename, doc_type='standalone')
+    doc = p2l.Document(filename, filepath=path, doc_type='standalone')
 
     doc += plot_mprime_best(ms, risks, d, delta)
 
     print('Building...')
-    doc.build(delete_files='all')
+    doc.build(delete_files='all', show_pdf=False)

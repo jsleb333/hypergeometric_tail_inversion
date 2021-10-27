@@ -1,13 +1,14 @@
 import numpy as np
 import csv
 from itertools import product
-import os, sys
-sys.path.append(os.getcwd())
-from graal_utils import Timer
 import pandas as pd
 import xarray as xr
+from graal_utils import Timer
 
 from hypergeo import hypinv_upperbound
+
+import os
+path = os.path.dirname(__file__) + '/data/'
 
 
 def compute_bound_data(k, m, delta=0.05, d=10, max_mprime=300):
@@ -34,7 +35,6 @@ if __name__ == "__main__":
     ds = [5, 10, 20, 35, 50]
     deltas = [0.0001, 0.0025, 0.05, 0.1]
 
-    path = './scripts/mprime_tradeoff/data/'
     os.makedirs(path, exist_ok=True)
 
     # Generates all the data and saves it

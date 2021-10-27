@@ -2,7 +2,8 @@ import numpy as np
 import xarray as xr
 import os
 
-os.chdir('./scripts/mprime_tradeoff/')
+import os
+os.chdir(os.path.dirname(__file__))
 
 
 data = xr.open_dataset('data/optimal_bound.nc').drop_sel(d=50)
