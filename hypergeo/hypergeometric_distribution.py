@@ -54,6 +54,23 @@ def hypergeometric_tail(k, m, K, M):
     # return sum(hypergeom.pmf(j, M, K, m) for j in range(max(0, m-M+K), k+1))
 
 
+def log_hypergeometric_tail(k, m, K, M):
+    """
+    Logarithm of the hypergeometric distribution tail.
+
+        logHyp(k, m, K, M) = log(Σ_(j<=k) hyp(j, m, K, M)),
+
+    where hyp(j, m, K, M) is the probability mass function.
+
+    Args:
+        k (int): Number of errors observed.
+        m (int): Sample size.
+        K (int): Number of errors in the whole population.
+        M (int): Population size.
+    """
+    return hypergeom.logcdf(k, M, K, m)
+
+
 def hypergeometric_lower_tail(k, m, K, M):
     return hypergeom.sf(k, M, K, m)
 
@@ -133,24 +150,19 @@ def hypergeometric_tail_inverse(k, m, delta, M, log_delta=False):
     K_min = k
     K_max = M - m + k + 1
     K_mid = (K_max + K_min + 1)//2
-    hyp_cdf = hypergeometric_tail(k, m, K_mid, M)
+    # hyp_cdf = hypergeometric_tail(k, m, K_mid, M)
     if log_delta:
-        if np.isclose(hyp_cdf, 0):
-            hyp_cdf = -np.inf
-        else:
-            hyp_cdf = np.log(hyp_cdf)
+        cdf_func = hypergeom.logcdf
+    else:
+        cdf_func = hypergeom.cdf
+    hyp_cdf = cdf_func(k, M, K_mid, m)
     while K_max - K_min > 1:
         if hyp_cdf > delta and not close_to(hyp_cdf, delta, atol=0, rtol=10e-16):
             K_min = K_mid
         else:
             K_max = K_mid
         K_mid = (K_max + K_min + 1)//2
-        hyp_cdf = hypergeometric_tail(k, m, K_mid, M)
-        if log_delta:
-            if hyp_cdf == 0:
-                hyp_cdf == -np.inf
-            else:
-                hyp_cdf = np.log(hyp_cdf)
+        hyp_cdf = cdf_func(k, M, K_mid, m)
 
     return K_max
 
